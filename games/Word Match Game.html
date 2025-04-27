@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Matching Game | English Mastery</title>
+    <link rel="stylesheet" href="../css/style.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Basic Styles (Keep similar to other pages) --- */
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333; display: flex; flex-direction: column; min-height: 100vh; align-items: center;}
+        .main-header { width: 100%; background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; position: relative; margin-bottom: 1rem;}
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .logo { color: #333; font-size: 2rem; font-weight: 700; text-decoration: none; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .nav-links li { margin: 0 1rem; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 600; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #007bff; }
+        .footer { background-color: #333; color: white; text-align: center; padding: 1rem 0; width: 100%; margin-top: auto; }
+        .footer p { margin: 0; }
+
+        /* --- Game Specific Styles --- */
+         .game-content {
+             flex-grow: 1;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             /* Removed justify-content: center to allow content flow */
+             width: 100%;
+             padding: 20px;
+             box-sizing: border-box;
+         }
+        .game-title {
+            color: #ad1457; /* Original pink color */
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+         }
+        .game-container {
+            display: flex;
+            gap: 40px;
+            margin-top: 10px; /* Reduced margin */
+            align-items: flex-start;
+            justify-content: center; /* Center columns */
+            flex-wrap: wrap; /* Allow wrapping */
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 800px; /* Max width for the game area */
+            width: 95%;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Increased gap */
+            align-items: center; /* Center cards in column */
+            min-width: 150px; /* Ensure columns have some width */
+        }
+         .column h3 { /* Style for column headers */
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+         }
+        .card {
+            background: white;
+            padding: 15px 25px; /* Adjusted padding */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            min-width: 140px; /* Slightly increased min-width */
+            text-align: center;
+            font-size: 1.1rem; /* Slightly larger font */
+            transition: transform 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+             border: 2px solid transparent; /* Add transparent border for selection effect */
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .card.selected {
+            background: #fff9c4 !important; /* Yellow */
+             border: 2px solid #fbc02d; /* Darker yellow border */
+             transform: scale(1.03);
+        }
+        .card.matched {
+            background-color: #c8e6c9 !important; /* Green */
+            color: #388e3c;
+            pointer-events: none; /* Disable interaction */
+            opacity: 0.7;
+            box-shadow: none;
+        }
+         .card.incorrect-match { /* Style for temporary wrong match indication */
+            background-color: #ffcdd2 !important; /* Light red */
+             border-color: #e57373;
+             animation: shake 0.5s;
+         }
+         @keyframes shake { /* Simple shake animation */
+             0%, 100% { transform: translateX(0); }
+             25% { transform: translateX(-5px); }
+             75% { transform: translateX(5px); }
+         }
+        .feedback-area { /* Area for messages below the game */
+            margin-top: 20px;
+            text-align: center;
+            width: 100%;
+        }
+        .feedback {
+            font-weight: bold;
+            color: #d32f2f;
+             min-height: 1.5em;
+             font-size: 1.1rem;
+        }
+        .loading-message {
+             font-size: 1.2rem;
+             color: #555;
+             margin: 20px;
+         }
+         /* --- Game Progress Bar Styles --- */
+          .game-progress-container {
+             width: 90%;
+             max-width: 500px;
+             background-color: #e0e0e0;
+             border-radius: 10px;
+             margin: 1rem auto 1.5rem auto;
+             overflow: hidden;
+             box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+         }
+         .game-progress-bar {
+             width: 0%;
+             height: 20px;
+             background-color: #17a2b8; /* Teal/Info color */
+             text-align: center;
+             line-height: 20px;
+             color: white;
+             font-weight: bold;
+             font-size: 0.9rem;
+             border-radius: 10px 0 0 10px;
+             transition: width 0.5s ease-in-out;
+         }
+         /* --- End Game Progress Bar Styles --- */
+          .completion-message {
+             margin-top: 10px;
+             font-size: 1rem;
+             color: #17a2b8; /* Teal */
+             font-weight: bold;
+         }
+    </style>
+
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <a href="../dashboard.html" class="logo">English Mastery</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" id="logoutLink">Logout</a></li>
+                    <li><a href="../dashboard.html">Dashboard</a></li>
+                    <li><a href="../games.html">Games</a></li>
+                    <li><a href="../review.html">Review</a></li>
+                    <li><a href="../wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+     <div class="game-content">
+         <h1 class="game-title">Match the Word with Its Translation</h1>
+
+         <div class="game-progress-container" id="gameProgressContainer" style="display: none;">
+             <div class="game-progress-bar" id="gameProgressBar">0/10 Words</div>
+         </div>
+         <div class="completion-message" id="gameCompletionMessage" style="display: none;">
+             🎉 Game goal achieved for today! (10% added to daily progress)
+         </div>
+
+        <div class="game-container" id="mainGameContainer">
+            <div class="column">
+                 <h3>Arabic Translations</h3>
+                 <div id="arabic-translations">
+                      <p class="loading-message">Loading...</p>
+                 </div>
+            </div>
+            <div class="column">
+                 <h3>English Words</h3>
+                 <div id="english-words">
+                      <p class="loading-message">Loading...</p>
+                 </div>
+            </div>
+        </div>
+
+        <div class="feedback-area">
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        // --- Firebase Imports ---
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.firebasestorage.app",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const englishContainer = document.getElementById("english-words");
+        const arabicContainer = document.getElementById("arabic-translations");
+        const feedback = document.getElementById("feedback");
+        const logoutLink = document.getElementById('logoutLink');
+        const gameProgressContainer = document.getElementById('gameProgressContainer');
+        const gameProgressBar = document.getElementById('gameProgressBar');
+        const gameCompletionMessage = document.getElementById('gameCompletionMessage');
+        const mainGameContainer = document.getElementById('mainGameContainer');
+
+
+        // --- Game State Variables ---
+        let currentUserUID = null;
+        let allUserWords = []; // All words from Firestore
+        let dailyReviewWords = []; // IDs only
+        let dailyReviewProgress = {}; // { wordId: boolean }
+        let sessionErrors = []; // Store IDs of English words involved in mismatches
+        let sessionCorrectUniqueWords = new Set(); // Track unique correct word IDs (English word IDs)
+        let gameCompletedToday = false;
+        const GAME_COMPLETION_TARGET = 10;
+        const GAME_NAME = 'wordmatch'; // Unique name for localStorage
+        const WORDS_PER_ROUND = 6; // Number of pairs to show at once
+
+        let currentRoundWords = []; // Word objects for the current 6 pairs
+        let selectedCards = []; // { cardElement, type: 'english'/'arabic', value: 'word/translation', wordId: 'id' }
+        let matchedPairsCount = 0; // Track matches in the current round
+        let isChecking = false; // Prevent actions during check delay
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserUID = user.uid;
+                loadGameData();
+            } else {
+                window.location.href = '../index.html';
+            }
+        });
+
+        // --- Load Initial Game Data ---
+        async function loadGameData() {
+            if (!currentUserUID) return;
+            console.log("Loading game data...");
+            feedback.textContent = ""; // Clear feedback
+             setLoadingState(true);
+
+            try {
+                 // 1. Load all words from Firestore
+                 const wordsRef = collection(db, "users", currentUserUID, "words");
+                 const q = query(wordsRef);
+                 const querySnapshot = await getDocs(q);
+                 allUserWords = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                 allUserWords = allUserWords.filter(word => word && word.word && word.translation); // Ensure needed fields exist
+                 console.log(`Loaded ${allUserWords.length} valid words from Firestore.`);
+
+                 if (allUserWords.length < WORDS_PER_ROUND) {
+                     feedback.textContent = `Need at least ${WORDS_PER_ROUND} words to play this game.`;
+                     setLoadingState(false); // Or hide containers
+                     mainGameContainer.style.display = 'none'; // Hide game area if not enough words
+                     return;
+                 } else {
+                      mainGameContainer.style.display = 'flex'; // Ensure it's visible
+                 }
+
+                 // 2. Load daily review data from localStorage
+                 const storedReviewWords = localStorage.getItem(`reviewWords_${currentUserUID}`);
+                 const storedProgress = localStorage.getItem(`reviewProgress_${currentUserUID}`);
+                 const reviewDate = localStorage.getItem(`reviewDate_${currentUserUID}`);
+                 const today = new Date().toISOString().split('T')[0];
+
+                 if (storedReviewWords && reviewDate === today) {
+                     dailyReviewWords = JSON.parse(storedReviewWords).map(word => word.id);
+                     dailyReviewProgress = storedProgress ? JSON.parse(storedProgress) : {};
+                     console.log(`Loaded ${dailyReviewWords.length} daily review word IDs.`);
+                 } else {
+                     console.log("No valid daily review words found for today.");
+                     dailyReviewWords = [];
+                     dailyReviewProgress = {};
+                 }
+
+                 // 3. Check if game was already completed today
+                 const completionKey = `gameCompletion_${currentUserUID}_${GAME_NAME}_${today}`;
+                 gameCompletedToday = localStorage.getItem(completionKey) === 'true';
+                 console.log(`Game completed today (${GAME_NAME}): ${gameCompletedToday}`);
+
+                  // 4. Start the first round
+                 sessionErrors = [];
+                 sessionCorrectUniqueWords = new Set(); // Reset session correct words
+                 updateGameProgressIndicator(); // Show initial game progress
+                 loadNewRound(); // Load the first set of pairs
+            } catch (error) {
+                 console.error("Error loading game data:", error);
+                  feedback.textContent = 'Error loading words. Please try again later.';
+             } finally {
+                  setLoadingState(false);
+             }
+        }
+
+        // --- Load a New Round of 6 Pairs ---
+         function loadNewRound() {
+            console.log("Loading new round...");
+            isChecking = false;
+            selectedCards = [];
+            matchedPairsCount = 0;
+            englishContainer.innerHTML = ""; // Clear previous cards
+            arabicContainer.innerHTML = "";
+            feedback.textContent = ""; // Clear feedback from previous round
+
+             currentRoundWords = selectWordsForRound(WORDS_PER_ROUND); // Select 6 words based on priority
+
+             if (currentRoundWords.length < WORDS_PER_ROUND) {
+                  console.log("Not enough words remaining for a full round.");
+                  // Handle end game state or show fewer pairs?
+                  if (currentRoundWords.length === 0) {
+                      feedback.textContent = "No more words to display.";
+                      return; // Stop if absolutely no words left
+                  }
+             }
+
+            const translations = shuffleArray(currentRoundWords.map(w => w.translation));
+            const englishWords = shuffleArray([...currentRoundWords]); // Shuffle copy
+
+             englishWords.forEach((wordObj) => {
+                const engCard = createCard(wordObj.word, 'english', wordObj.id);
+                englishContainer.appendChild(engCard);
+            });
+
+            translations.forEach((translation) => {
+                // Find the original word ID for this translation to link them
+                const originalWord = currentRoundWords.find(w => w.translation === translation);
+                const arCard = createCard(translation, 'arabic', originalWord ? originalWord.id : 'unknown'); // Link by ID
+                arabicContainer.appendChild(arCard);
+            });
+         }
+
+         // --- Word Selection Logic for a Round ---
+         function selectWordsForRound(count) {
+             let selectedWords = [];
+             let availableWords = [...allUserWords]; // Work with a copy
+
+             // Helper to add a word if not already selected
+             const addWord = (word) => {
+                 if (word && !selectedWords.some(sw => sw.id === word.id)) {
+                     selectedWords.push(word);
+                 }
+             };
+
+             // Priority 1: Session Errors (Words involved in previous mismatches)
+             let errorIdsToInclude = [...sessionErrors]; // Copy error IDs
+             shuffleArray(errorIdsToInclude);
+             for (const errorId of errorIdsToInclude) {
+                 if (selectedWords.length >= count) break;
+                 const errorWord = availableWords.find(w => w.id === errorId);
+                 addWord(errorWord);
+             }
+             console.log("Selected after errors:", selectedWords.length);
+
+
+             // Priority 2: Incomplete Daily Review Words
+             const incompleteDailyWordIds = dailyReviewWords.filter(id => !dailyReviewProgress[id]);
+             shuffleArray(incompleteDailyWordIds);
+             for (const dailyId of incompleteDailyWordIds) {
+                 if (selectedWords.length >= count) break;
+                 const dailyWord = availableWords.find(w => w.id === dailyId);
+                 addWord(dailyWord);
+             }
+              console.log("Selected after daily:", selectedWords.length);
+
+
+             // Priority 3: Other words not yet correctly matched in this session (if goal not met)
+             if (!gameCompletedToday || sessionCorrectUniqueWords.size < GAME_COMPLETION_TARGET) {
+                  let otherWords = availableWords.filter(w =>
+                      !selectedWords.some(sw => sw.id === w.id) && // Not already selected
+                      !sessionCorrectUniqueWords.has(w.id) // Not already correctly matched this session
+                  );
+                  shuffleArray(otherWords);
+                  for (const otherWord of otherWords) {
+                      if (selectedWords.length >= count) break;
+                      addWord(otherWord);
+                  }
+             }
+             console.log("Selected after other (goal not met):", selectedWords.length);
+
+
+             // Priority 4: Fill remaining slots with any available word
+             let remainingAvailable = availableWords.filter(w => !selectedWords.some(sw => sw.id === w.id));
+             shuffleArray(remainingAvailable);
+             for (const randomWord of remainingAvailable) {
+                 if (selectedWords.length >= count) break;
+                 addWord(randomWord);
+             }
+             console.log("Selected finally:", selectedWords.length);
+
+             return selectedWords.slice(0, count); // Return the requested number
+         }
+
+
+        // --- Create Card Element ---
+        function createCard(text, type, wordId) {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.innerText = text;
+            card.dataset.type = type; // 'english' or 'arabic'
+            card.dataset.value = text; // The text itself
+            card.dataset.wordId = wordId; // The ID of the corresponding English word
+            card.addEventListener("click", () => handleCardClick(card));
+            return card;
+        }
+
+        // --- Handle Card Click ---
+        function handleCardClick(card) {
+            if (isChecking || card.classList.contains("matched") || card.classList.contains("selected")) return;
+
+            card.classList.add("selected");
+            selectedCards.push({
+                 cardElement: card,
+                 type: card.dataset.type,
+                 value: card.dataset.value,
+                 wordId: card.dataset.wordId // Store the word ID
+            });
+
+            if (selectedCards.length === 2) {
+                 isChecking = true; // Prevent clicks during check
+                 checkMatch();
+            }
+        }
+
+        // --- Check if Selected Cards Match ---
+        async function checkMatch() {
+            const [card1Info, card2Info] = selectedCards;
+
+            // Ensure one English and one Arabic card are selected
+            if (card1Info.type === card2Info.type) {
+                 feedback.textContent = "Select one English and one Arabic card.";
+                 resetSelection(false); // Reset without marking as incorrect match
+                return;
+            }
+
+            // Match based on word ID
+            const isMatch = (card1Info.wordId === card2Info.wordId);
+            const matchedWordId = card1Info.wordId; // ID of the word being matched
+            const matchedWordObj = allUserWords.find(w => w.id === matchedWordId);
+
+            const batch = writeBatch(db); // Batch updates for Firestore
+            let updatesMade = false;
+
+
+            if (isMatch && matchedWordObj) {
+                feedback.textContent = `✅ Correct: ${matchedWordObj.word} - ${matchedWordObj.translation}`;
+                card1Info.cardElement.classList.add("matched");
+                card2Info.cardElement.classList.add("matched");
+                card1Info.cardElement.classList.remove("selected");
+                card2Info.cardElement.classList.remove("selected");
+
+                matchedPairsCount++;
+                sessionCorrectUniqueWords.add(matchedWordId); // Track unique correct match
+                updateGameProgressIndicator(); // Update game progress bar
+
+                 // Update score/difficulty (positive)
+                 const scoreChange = 1;
+                 matchedWordObj.score = (matchedWordObj.score || 0) + scoreChange;
+                 updateWordDifficulty(matchedWordObj);
+                 const wordRef = doc(db, "users", currentUserUID, "words", matchedWordId);
+                 batch.update(wordRef, { score: matchedWordObj.score, difficulty: matchedWordObj.difficulty });
+                 updatesMade = true;
+
+
+                // Update daily review progress if applicable
+                 if (dailyReviewWords.includes(matchedWordId) && !dailyReviewProgress[matchedWordId]) {
+                     dailyReviewProgress[matchedWordId] = true;
+                     localStorage.setItem(`reviewProgress_${currentUserUID}`, JSON.stringify(dailyReviewProgress));
+                     console.log("Updated daily review progress for word:", matchedWordObj.word);
+                 }
+
+                 // Remove from session errors if it was there
+                 const errorIndex = sessionErrors.indexOf(matchedWordId);
+                 if (errorIndex > -1) {
+                     sessionErrors.splice(errorIndex, 1);
+                 }
+
+                 // Check for game completion
+                 if (!gameCompletedToday && sessionCorrectUniqueWords.size >= GAME_COMPLETION_TARGET) {
+                     gameCompletedToday = true;
+                     const today = new Date().toISOString().split('T')[0];
+                     const completionKey = `gameCompletion_${currentUserUID}_${GAME_NAME}_${today}`;
+                     localStorage.setItem(completionKey, 'true');
+                     console.log(`Game goal achieved for ${GAME_NAME} today!`);
+                     gameCompletionMessage.style.display = 'block';
+                 }
+
+            } else {
+                // Incorrect Match
+                 feedback.textContent = "❌ Incorrect match. Try again.";
+                 card1Info.cardElement.classList.add("incorrect-match");
+                 card2Info.cardElement.classList.add("incorrect-match");
+
+                 // Update score/difficulty (negative) for both involved words
+                 const word1 = allUserWords.find(w => w.id === card1Info.wordId);
+                 const word2 = allUserWords.find(w => w.id === card2Info.wordId);
+
+                 if (word1) {
+                      word1.score = (word1.score || 0) - 1; // More significant penalty for direct mismatch
+                      updateWordDifficulty(word1);
+                      const word1Ref = doc(db, "users", currentUserUID, "words", word1.id);
+                      batch.update(word1Ref, { score: word1.score, difficulty: word1.difficulty });
+                      if (!sessionErrors.includes(word1.id)) sessionErrors.push(word1.id); // Add word1 to errors
+                      updatesMade = true;
+                 }
+                 if (word2 && word1 !== word2) { // Ensure it's a different word
+                      word2.score = (word2.score || 0) - 1;
+                      updateWordDifficulty(word2);
+                      const word2Ref = doc(db, "users", currentUserUID, "words", word2.id);
+                      batch.update(word2Ref, { score: word2.score, difficulty: word2.difficulty });
+                      if (!sessionErrors.includes(word2.id)) sessionErrors.push(word2.id); // Add word2 to errors
+                       updatesMade = true;
+                 }
+
+                setTimeout(() => resetSelection(true), 800); // Longer delay for incorrect match
+            }
+
+            // Commit Firestore updates if any were made
+            if (updatesMade) {
+                 try {
+                     await batch.commit();
+                     console.log("Batch update successful for matched/mismatched words.");
+                 } catch (error) {
+                     console.error("Error committing batch update:", error);
+                     feedback.textContent = 'Error updating word data.';
+                 }
+            }
+
+            if (isMatch) {
+                 selectedCards = []; // Clear selection only on correct match
+                 isChecking = false; // Allow next selection
+                 // Check if round is complete
+                 if (matchedPairsCount === currentRoundWords.length) {
+                      feedback.textContent = "Round Complete! Loading next set...";
+                      setTimeout(loadNewRound, 1200); // Load next round after delay
+                 }
+            }
+             // Note: For incorrect matches, resetSelection handles clearing selectedCards and isChecking
+        }
+
+
+        // --- Reset Selection Visuals ---
+        function resetSelection(wasIncorrect) {
+             selectedCards.forEach(info => {
+                 info.cardElement.classList.remove("selected");
+                 if (wasIncorrect) {
+                      info.cardElement.classList.remove("incorrect-match"); // Remove red highlight
+                 }
+             });
+             selectedCards = [];
+             isChecking = false; // Allow selection again
+        }
+
+        // --- Update Word Difficulty Helper ---
+        function updateWordDifficulty(word) {
+             if (word.score === undefined || word.score === null) word.score = 0; // Initialize score
+             if (word.score >= 2) word.difficulty = "easy";
+             else if (word.score <= -2) word.difficulty = "hard";
+             else word.difficulty = "medium";
+        }
+
+        // --- Update Game Progress Bar ---
+         function updateGameProgressIndicator() {
+             const currentCount = sessionCorrectUniqueWords.size;
+             const target = GAME_COMPLETION_TARGET;
+             const percentage = Math.min(100, Math.round((currentCount / target) * 100));
+
+             gameProgressBar.style.width = `${percentage}%`;
+             gameProgressBar.textContent = `${currentCount}/${target} Correct Unique`;
+             gameProgressContainer.style.display = 'block';
+             gameCompletionMessage.style.display = gameCompletedToday ? 'block' : 'none';
+         }
+
+         // --- Helper to set loading state ---
+         function setLoadingState(isLoading) {
+             if (isLoading) {
+                  englishContainer.innerHTML = '<p class="loading-message">Loading...</p>';
+                  arabicContainer.innerHTML = '<p class="loading-message">Loading...</p>';
+             }
+             // Enabling/disabling happens within specific functions now
+         }
+
+
+        // --- Utility: Shuffle Array ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Logout ---
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            signOut(auth).then(() => {
+                console.log('User signed out.');
+                window.location.href = '../index.html';
+            }).catch((error) => {
+                console.error('Error signing out:', error);
+                alert('Logout failed. Please try again.');
+            });
+        });
+
+    </script>
+</body>
+</html>

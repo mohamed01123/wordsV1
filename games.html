@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games | English Mastery</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <h1 class="logo">English Mastery</h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html" id="logoutLink">logout</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="review.html">Review</a></li>
+                    <li><a href="wordsmanger.html">Add word</a></li>
+
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-section gradient-bg">
+        <div class="container">
+            <h2>Interactive Games</h2>
+            <p>Practice your vocabulary with fun and engaging games!</p>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <div class="feature-box">
+                <h3>🎴 Flashcards</h3>
+                <p>Flip cards and match the meaning of words.</p>
+                <a href="games/flashcards.html" class="btn-primary">Play Now</a>
+            </div>
+            <div class="feature-box">
+                <h3>🧠 Word Match</h3>
+                <p>Match English words with their Arabic translations.</p>
+                <a href="games/Word Match Game.html" class="btn-primary">Play Now</a>
+            </div>
+            <div class="feature-box">
+                <h3>✍️ Complete the Sentence</h3>
+                <p>Fill in the blanks using the correct word.</p>
+                <a href="games/Complete the Sentence.html" class="btn-primary">Play Now</a>
+            </div>
+            <div class="feature-box">
+                <h3>🔁 Mix & Match</h3>
+                <p>Reorder words to build correct sentences.</p>
+                <a href="games/Mix&Match.html" class="btn-primary">Play Now</a>
+            </div>
+            <div class="feature-box">
+                <h3>✍️ spelling </h3>
+                <p>Translate the word with the correct spelling</p>
+                <a href="games/spelling.html" class="btn-primary">Play Now</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.firebasestorage.app",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    
+        logoutLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        signOut(auth)
+            .then(() => {
+                localStorage.removeItem('loggedIn');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            })
+            .catch((error) => {
+                console.error('Logout error', error);
+            });
+    });
+    </script>
+</body>
+</html>

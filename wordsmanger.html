@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #fdfbfb, #ebedee);
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #444;
+        }
+        .form {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            margin: 0 auto 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        input, select, button {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .hard {
+            color: red;
+        }
+        .easy {
+            color: green;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 50px;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #generatedWords p {
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #generatedWords .save-word {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        #generatedWords .save-word:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <h1 class="logo">English Mastery</h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html" id="logoutLink">logout</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="review.html">Review</a></li>
+                    <li><a href="wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <h1>Word Management</h1>
+    <div>
+        <button id="exportData">تصدير البيانات</button>
+        <input type="file" id="importFile" style="display: none;" accept=".json, .txt">
+        <button id="importData">استيراد البيانات</button>
+        <p id="exportImportMessage" class="success-message error-message" style="display: none;"></p>
+    </div>
+    <div class="form">
+        <input type="text" id="word" placeholder="Word in English">
+        <input type="text" id="translation" placeholder="Translation">
+        <input type="text" id="example" placeholder="Example Sentence (containing the word)">
+        <input type="text" id="exampleTranslation" placeholder="Translation of the Example Sentence">
+        <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button id="saveWordButton">Save Word</button>
+        <p id="addWordMessage" class="success-message error-message" style="display: none;"></p>
+    </div>
+    <p>Total words saved: <span id="total-word-count">0</span></p>
+    <table id="wordsTable">
+        <thead>
+            <tr>
+                <th>Word</th>
+                <th>Translation</th>
+                <th>Difficulty</th>
+                <th>Example</th>
+                <th>Example Translation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <footer class="main-footer">
+        <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+    <div class="fab" >+</div>
+    <div id="wordGeneratorModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Word Generator</h2>
+            <label for="topic">Topic:</label>
+            <input type="text" id="topic" name="topic"><br><br>
+            <label for="level">Level:</label>
+            <select id="level" name="level">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select><br><br>
+            <label for="notes">Additional Notes:</label>
+            <textarea id="notes" name="notes"></textarea><br><br>
+            <button id="generateWords">Generate Words</button>
+            <div id="generatedWords"></div>
+        </div>
+    </div>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.firebasestorage.app",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUserUID = null;
+        const exportImportMessage = document.getElementById('exportImportMessage');
+        const addWordMessage = document.getElementById('addWordMessage');
+
+        // هنا ضع عنوان URL الخاص بواجهة برمجة تطبيقات توليد الكلمات الخاصة بك
+        const GENERATE_WORDS_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyD8QvBtQR91QhWenishcvNGULFxFMJZKyM';
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                localStorage.setItem('loggedIn', 'true');
+                currentUserUID = user.uid;
+                fetchWords();
+            }
+        });
+
+        async function fetchWords() {
+            if (!currentUserUID) {
+                console.error("No user is logged in.");
+                return;
+            }
+            const wordsRef = collection(db, "users", currentUserUID, "words"); // Correct: User's subcollection
+            const q = query(wordsRef); // No need for `where`
+            const querySnapshot = await getDocs(q);
+            const words = [];
+            querySnapshot.forEach((doc) => {
+                words.push({ id: doc.id, ...doc.data() });
+            });
+            renderWords(words);
+        }
+
+        function renderWords(words) {
+            const tbody = document.querySelector("#wordsTable tbody");
+            const totalWordCountSpan = document.getElementById("total-word-count");
+            tbody.innerHTML = "";
+            words.forEach((word) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${word.word}</td>
+                    <td>${word.translation}</td>
+                    <td class="${word.difficulty}">${word.difficulty}</td>
+                    <td>${word.example || ''}</td>
+                    <td>${word.exampleTranslation || ''}</td>
+                    <td><button class="deleteButton" data-id="${word.id}">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+            totalWordCountSpan.textContent = words.length;
+            attachDeleteListeners();
+        }
+
+        async function addWord() {
+            const word = document.getElementById("word").value.trim();
+            const translation = document.getElementById("translation").value.trim();
+            const difficulty = document.getElementById("difficulty").value;
+            const example = document.getElementById("example").value.trim();
+            const exampleTranslation = document.getElementById("exampleTranslation").value.trim();
+
+            if (word && translation) {
+                try {
+                    await addDoc(collection(db, "users", currentUserUID, "words"), { // Correct: User's subcollection
+                        word,
+                        translation,
+                        difficulty,
+                        example,
+                        exampleTranslation
+                    });
+                    document.getElementById("word").value = "";
+                    document.getElementById("translation").value = "";
+                    document.getElementById("example").value = "";
+                    document.getElementById("exampleTranslation").value = "";
+                    addWordMessage.textContent = "تم حفظ الكلمة بنجاح.";
+                    addWordMessage.style.display = 'block';
+                    setTimeout(() => {
+                        addWordMessage.style.display = 'none';
+                    }, 3000);
+                    fetchWords();
+                } catch (e) {
+                    console.error("Error adding document: ", e);
+                    addWordMessage.textContent = "حدث خطأ أثناء حفظ الكلمة.";
+                    addWordMessage.style.display = 'block';
+                    setTimeout(() => {
+                        addWordMessage.style.display = 'none';
+                    }, 3000);
+                }
+            } else {
+                addWordMessage.textContent = "يرجى إدخال الكلمة والترجمة.";
+                addWordMessage.style.display = 'block';
+                setTimeout(() => {
+                    addWordMessage.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function attachDeleteListeners() {
+            const deleteButtons = document.querySelectorAll(".deleteButton");
+            deleteButtons.forEach((button) => {
+                button.addEventListener("click", async (event) => {
+                    const wordId = event.target.dataset.id;
+                    await deleteWord(wordId);
+                });
+            });
+        }
+
+        async function deleteWord(wordId) {
+            try {
+                await deleteDoc(doc(db, "users", currentUserUID, "words", wordId));
+                fetchWords();
+            } catch (e) {
+                console.error("Error deleting document: ", e);
+                alert("حدث خطأ أثناء حذف الكلمة.");
+            }
+        }
+
+        async function exportData() {
+            if (!currentUserUID) {
+                exportImportMessage.textContent = "لا يوجد مستخدم مسجل للدخول.";
+                exportImportMessage.style.display = 'block';
+                return;
+            }
+            const wordsRef = collection(db, "users", currentUserUID, "words");
+            const q = query(wordsRef);
+            const querySnapshot = await getDocs(q);
+            const words = [];
+            querySnapshot.forEach((doc) => {
+                words.push(doc.data());
+            });
+            const json = JSON.stringify(words);
+            const filename = 'my_words.json';
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            exportImportMessage.textContent = "تم تصدير البيانات بنجاح.";
+            exportImportMessage.style.display = 'block';
+            setTimeout(() => {
+                exportImportMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        async function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const importedWords = JSON.parse(e.target.result);
+                        if (Array.isArray(importedWords)) {
+                            for (const wordData of importedWords) {
+                                await addDoc(collection(db, "users", currentUserUID, "words"), {
+                                    word: wordData.word,
+                                    translation: wordData.translation,
+                                    difficulty: wordData.difficulty,
+                                    example: wordData.example,
+                                    exampleTranslation: wordData.exampleTranslation
+                                });
+                            }
+                            exportImportMessage.textContent = "تم استيراد البيانات بنجاح.";
+                            exportImportMessage.style.display = 'block';
+                            setTimeout(() => {
+                                exportImportMessage.style.display = 'none';
+                            }, 3000);
+                            fetchWords();
+                        } else {
+                            exportImportMessage.textContent = "تنسيق ملف غير صالح.";
+                            exportImportMessage.style.display = 'block';
+                            setTimeout(() => {
+                                exportImportMessage.style.display = 'none';
+                            }, 3000);
+                        }
+                    } catch (error) {
+                        console.error("Error importing data: ", error);
+                        exportImportMessage.textContent = "حدث خطأ أثناء استيراد البيانات.";
+                        exportImportMessage.style.display = 'block';
+                        setTimeout(() => {
+                            exportImportMessage.style.display = 'none';
+                        }, 3000);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        async function logoutUser() {
+            try {
+                await signOut(auth);
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error("Error signing out: ", error);
+                alert("حدث خطأ أثناء تسجيل الخروج.");
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportButton = document.getElementById('exportData');
+            const importButton = document.getElementById('importData');
+            const importFile = document.getElementById('importFile');
+            const saveWordButton = document.getElementById('saveWordButton');
+
+            saveWordButton.addEventListener('click', addWord);
+            exportButton.addEventListener('click', exportData);
+            importButton.addEventListener('click', () => importFile.click());
+            importFile.addEventListener('change', importData);
+        });
+
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            signOut(auth)
+                .then(() => {
+                    localStorage.removeItem('loggedIn');
+                    localStorage.removeItem('currentUser');
+                    window.location.href = 'index.html';
+                })
+                .catch((error) => {
+                    console.error('Logout error', error);
+                });
+        });
+
+        // Get the modal
+        var modal = document.getElementById("wordGeneratorModal");
+
+        // Get the button that opens the modal
+        var fab = document.querySelector(".fab");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        fab.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Get the generate button
+        var generateButton = document.getElementById("generateWords");
+        var generatedWordsDiv = document.getElementById("generatedWords");
+
+        // Add event listener to the generate button
+        generateButton.onclick = function() {
+            // Get input values
+            var topic = document.getElementById("topic").value.trim();
+            var level = document.getElementById("level").value;
+            var notes = document.getElementById("notes").value.trim();
+
+            if (GENERATE_WORDS_API_URL === 'YOUR_GENERATE_WORDS_API_ENDPOINT_HERE') {
+                generatedWordsDiv.innerHTML = '<p class="error-message">Please update GENERATE_WORDS_API_URL with your actual API endpoint.</p>';
+                return;
+            }
+
+            requestGeneratedWords(topic, level, notes, currentUserUID);
+        }
+
+        function requestGeneratedWords(topic, level, notes, userId) {
+            const promptText = `Generate a JSON array of English words related to the topic "${topic}" for the level "${level}". Each word object in the array should have the following fields: "word", "translation", "example", "difficulty", and "exampleTranslation". Additional notes: ${notes}. The response should be a JSON array.`;
+
+            const requestBody = JSON.stringify({
+                contents: [{
+                    parts: [{ text: promptText }]
+                }]
+            });
+
+            console.log("Sending data to:", GENERATE_WORDS_API_URL, requestBody);
+
+            fetch(GENERATE_WORDS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: requestBody,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Received data from API:", data);
+                if (data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+                    const generatedText = data.candidates[0].content.parts[0].text;
+                    try {
+                        const words = JSON.parse(generatedText);
+                        displayGeneratedWords(words);                    
+                    } catch (e) {
+                        console.error("Error parsing JSON response:", e);
+                        try {
+                            const jsonString = generatedText.substring(generatedText.indexOf("["), generatedText.lastIndexOf("]") + 1);
+                            const words = JSON.parse(jsonString);
+                            displayGeneratedWords(words);
+                        } catch (e) {
+                            console.error("Error parsing JSON response:", e);
+                            generatedWordsDiv.innerHTML = '<p class="error-message">Error parsing API response. Expected a JSON array.</p>';
+                        }
+                    }
+                } else if (data && data.error) {
+                    generatedWordsDiv.innerHTML = `<p class="error-message">Error from API: ${data.error}</p>`;
+                } else {
+                    generatedWordsDiv.innerHTML = '<p class="error-message">Invalid response from API.</p>';
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching generated words:", error);
+                generatedWordsDiv.innerHTML = `<p class="error-message">Failed to fetch generated words: ${error.message}</p>`;
+            });
+        }
+
+        function parseGeneratedWords(data) {
+            // The API now returns a JSON array directly, so we just return it.
+            return data;
+        }
+
+        function createSaveButton(wordData, userId) {
+            var button = document.createElement("button");
+            button.textContent = "Save";
+            button.className = "save-word";
+            button.onclick = function() {
+                saveGeneratedWord(wordData, userId);
+            };
+            return button;
+        }
+
+        function displayGeneratedWords(words) {
+            generatedWordsDiv.innerHTML = "";
+            if (Array.isArray(words)) {
+                words.forEach(wordData => {
+                    const p = document.createElement("p");
+                    p.innerHTML = `${wordData.word} (${wordData.translation}) <br> <em>${wordData.example}</em>`;
+                    const saveButton = createSaveButton(wordData, currentUserUID);
+                    p.appendChild(saveButton);
+                    generatedWordsDiv.appendChild(p);
+                });
+            } else {
+                generatedWordsDiv.innerHTML = '<p class="error-message">Invalid data format. Expected an array of words.</p>';
+            }
+        }
+
+        async function saveGeneratedWord(wordData, userId) {
+            try {
+                await addDoc(collection(db, "users", userId, "words"), {
+                    word: wordData.word,
+                    translation: wordData.translation,
+                    example: wordData.example,
+                    exampleTranslation: wordData.exampleTranslation,
+                    difficulty: wordData.difficulty
+                });
+                fetchWords();
+            } catch (error) {
+                console.error("Error saving generated word: ", error);
+                alert(`Failed to save word: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

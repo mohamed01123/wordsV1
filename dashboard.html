@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | English Mastery</title>
+    <link rel="stylesheet" href="css/style.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .main-header {
+            background-color: #fff;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .logo {
+            color: #333;
+            font-size: 2rem;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .nav-links li {
+            margin: 0 1rem;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #007bff;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .hero-section h2 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero-section p {
+            color: #555;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .dashboard-content {
+            padding: 2rem 0;
+            text-align: center;
+        }
+        .word-count-container {
+            margin-bottom: 2rem;
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: inline-block; /* يجعل العناصر تظهر بجانب بعضها */
+            margin: 0.5rem; /* مسافة بين العناصر */
+            min-width: 200px; /* حد أدنى للعرض */
+        }
+        .word-count-container h3 {
+            color: #333;
+            font-size: 1.5rem; /* تصغير حجم الخط قليلاً */
+            margin-top: 0; /* إزالة الهامش العلوي */
+            margin-bottom: 0.5rem;
+        }
+        .word-count {
+            font-size: 2.5rem; /* تصغير حجم الخط قليلاً */
+            font-weight: 700;
+            color: #007bff;
+            margin-top: 0.5rem;
+        }
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            /* justify-content: center; */ /* إزالة التوسيط للسماح بالمحتوى بالتمدد */
+            align-items: center;
+            padding: 2rem 0; /* إضافة padding */
+        }
+        .footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            width: 100%;
+            margin-top: auto;
+        }
+        .footer p {
+            margin: 0;
+        }
+        .motivational-area {
+            background-color: #e3f2fd; /* خلفية زرقاء فاتحة */
+            color: #0d47a1; /* لون نص أزرق غامق */
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 800px; /* تحديد عرض أقصى */
+            width: 90%; /* استخدام نسبة مئوية للعرض */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .motivational-area h4 {
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        .motivational-area p {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+
+         /* --- Progress Bar Styles --- */
+        .progress-container {
+            width: 80%;
+            max-width: 600px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 1rem auto; /* توسيط وإضافة هامش */
+            overflow: hidden; /* لإخفاء الأجزاء الزائدة من الشريط */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .progress-bar {
+            width: 0%; /* يبدأ من الصفر */
+            height: 25px;
+            background-color: #4caf50; /* أخضر */
+            text-align: center;
+            line-height: 25px; /* لتوسيط النص عمودياً */
+            color: white;
+            font-weight: bold;
+            border-radius: 10px 0 0 10px; /* زوايا دائرية للشريط */
+            transition: width 0.5s ease-in-out; /* حركة سلسة عند التغيير */
+        }
+        /* --- End Progress Bar Styles --- */
+
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+             <a href="dashboard.html" class="logo">English Mastery</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" id="logoutLink">Logout</a></li> <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="review.html">Review</a></li>
+                    <li><a href="wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="hero-section">
+            <div class="container">
+                <h2 id="welcomeMessage">Welcome to Your Dashboard</h2>
+                <p>Manage your words, play games, and review your progress here.</p>
+            </div>
+         </section>
+
+        <div id="motivationalArea" class="motivational-area" style="display: none;">
+            <h4>رسالة اليوم</h4>
+            <p id="motivationalMessageText"></p>
+        </div>
+
+         <div class="dashboard-content">
+             <div class="word-count-container">
+                 <h3>Total Words Added <span role="img" aria-label="muscle">💪</span></h3>
+                 <div class="word-count" id="wordCount">0</div>
+             </div>
+               <div class="word-count-container">
+                 <h3>Easy Words <span role="img" aria-label="star">⭐</span></h3>
+                 <div class="word-count" id="easyWordCount">0</div>
+             </div>
+             <div class="word-count-container">
+                 <h3>Medium Words <span role="img" aria-label="thinking face">🤔</span></h3>
+                 <div class="word-count" id="mediumWordCount">0</div>
+             </div>
+              <div class="word-count-container">
+                 <h3>Hard Words <span role="img" aria-label="brain">🧠</span></h3>
+                 <div class="word-count" id="hardWordCount">0</div>
+             </div>
+             <div class="word-count-container">
+                 <h3>Words for Review Today <span role="img" aria-label="calendar">📅</span></h3>
+                 <div class="word-count" id="reviewWordCount">0</div>
+                  <div class="progress-container" id="reviewProgressContainer" style="display: none;">
+                       <div class="progress-bar" id="reviewProgressBar">0%</div>
+                  </div>
+             </div>
+         </div>
+
+    </main>
+
+    <footer class="main-footer"> <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, limit, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.appspot.com",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+    
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const logoutLink = document.getElementById('logoutLink');
+        const wordCountElement = document.getElementById('wordCount');
+        const easyWordCountElement = document.getElementById('easyWordCount');
+        const mediumWordCountElement = document.getElementById('mediumWordCount');
+        const hardWordCountElement = document.getElementById('hardWordCount');
+        const reviewWordCountElement = document.getElementById('reviewWordCount');
+        const motivationalArea = document.getElementById('motivationalArea');
+        const motivationalMessageText = document.getElementById('motivationalMessageText');
+        const welcomeMessageElement = document.getElementById('welcomeMessage');
+        const reviewProgressContainer = document.getElementById('reviewProgressContainer');
+        const reviewProgressBar = document.getElementById('reviewProgressBar');
+
+
+        // --- Global Variables ---
+        let currentUserUID = null;
+        const DAILY_REVIEW_COUNT = 10; // عدد كلمات المراجعة اليومية
+
+        // --- Authentication State Change ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserUID = user.uid;
+                // --- Get User Profile (Optional: For welcome message) ---
+                try {
+                    const userProfileRef = doc(db, "users", currentUserUID);
+                    const userProfileSnap = await getDoc(userProfileRef);
+                    if (userProfileSnap.exists() && userProfileSnap.data().username) {
+                        welcomeMessageElement.textContent = `Welcome back, ${userProfileSnap.data().username}!`;
+                    } else {
+                        welcomeMessageElement.textContent = 'Welcome to Your Dashboard';
+                    }
+                } catch (error) {
+                    console.error("Error fetching user profile:", error);
+                    welcomeMessageElement.textContent = 'Welcome to Your Dashboard';
+                }
+                // --- Load Data ---
+                await loadWordDataAndReview();
+                displayMotivationalMessage(); // عرض الرسالة التحفيزية الأولية
+                updateReviewProgress(); // تحديث شريط التقدم للمراجعة
+
+            } else {
+                // No user signed in. Redirect to login.
+                window.location.href = 'index.html'; // أو login.html
+            }
+        });
+
+        // --- Load Word Counts and Determine Review Words ---
+        async function loadWordDataAndReview() {
+            if (!currentUserUID) return;
+
+            const wordsRef = collection(db, "users", currentUserUID, "words");
+            const wordsQuery = query(wordsRef); // Query without specific ordering initially
+
+            try {
+                const querySnapshot = await getDocs(wordsQuery);
+                let allWords = [];
+                let easyCount = 0;
+                let mediumCount = 0;
+                let hardCount = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const wordData = { id: doc.id, ...doc.data() };
+                     // Initialize score if it doesn't exist
+                    if (wordData.score === undefined || wordData.score === null) {
+                       wordData.score = 0; // Default score
+                    }
+                    allWords.push(wordData);
+
+                    // Count difficulties
+                    const difficulty = wordData.difficulty || 'medium'; // Default to medium if not set
+                    if (difficulty === "easy") {
+                        easyCount++;
+                    } else if (difficulty === "medium") {
+                        mediumCount++;
+                    } else if (difficulty === "hard") {
+                        hardCount++;
+                    }
+                });
+
+                // Update Word Counts Display
+                wordCountElement.textContent = allWords.length;
+                easyWordCountElement.textContent = easyCount;
+                mediumWordCountElement.textContent = mediumCount;
+                hardWordCountElement.textContent = hardCount;
+
+                // --- Determine Daily Review Words (SRS Logic) ---
+                const today = new Date().toISOString().split('T')[0];
+                const reviewDate = localStorage.getItem(`reviewDate_${currentUserUID}`);
+                let reviewWords = JSON.parse(localStorage.getItem(`reviewWords_${currentUserUID}`)) || [];
+                let reviewProgress = JSON.parse(localStorage.getItem(`reviewProgress_${currentUserUID}`)) || {}; // Track progress {wordId: boolean}
+
+                // Check if it's a new day or no review words are set
+                if (reviewDate !== today || reviewWords.length === 0) {
+                    console.log("Generating new review words for today.");
+                    reviewProgress = {}; // Reset progress for the new day
+
+                    // Sort words: Prioritize 'hard', then by lowest 'score'
+                    allWords.sort((a, b) => {
+                        const difficultyOrder = { 'hard': 0, 'medium': 1, 'easy': 2 };
+                        const diffA = difficultyOrder[a.difficulty || 'medium'];
+                        const diffB = difficultyOrder[b.difficulty || 'medium'];
+
+                        if (diffA !== diffB) {
+                            return diffA - diffB; // Sort by difficulty first (hard comes first)
+                        }
+                        // If difficulty is the same, sort by score (lowest score first)
+                        return (a.score || 0) - (b.score || 0);
+                    });
+
+                    // Select the top DAILY_REVIEW_COUNT words
+                    reviewWords = allWords.slice(0, DAILY_REVIEW_COUNT);
+
+                    // Initialize progress for the new words
+                    reviewWords.forEach(word => {
+                        reviewProgress[word.id] = false; // false means not yet reviewed correctly today
+                    });
+
+
+                    // Save to localStorage specific to the user
+                    localStorage.setItem(`reviewWords_${currentUserUID}`, JSON.stringify(reviewWords));
+                    localStorage.setItem(`reviewDate_${currentUserUID}`, today);
+                    localStorage.setItem(`reviewProgress_${currentUserUID}`, JSON.stringify(reviewProgress));
+
+                    console.log("Selected review words:", reviewWords);
+                } else {
+                    console.log("Using existing review words for today.");
+                }
+
+                // Update Review Count Display
+                reviewWordCountElement.textContent = reviewWords.length;
+                updateReviewProgress(); // Update progress bar based on loaded/generated data
+
+
+            } catch (error) {
+                console.error("Error loading word data: ", error);
+                // Display error message to user?
+                 wordCountElement.textContent = 'Error';
+                 easyWordCountElement.textContent = 'X';
+                 mediumWordCountElement.textContent = 'X';
+                 hardWordCountElement.textContent = 'X';
+                 reviewWordCountElement.textContent = 'X';
+            }
+        }
+
+
+         // --- Update Review Progress Bar ---
+        function updateReviewProgress() {
+             if (!currentUserUID) return;
+
+             const reviewWords = JSON.parse(localStorage.getItem(`reviewWords_${currentUserUID}`)) || [];
+             const reviewProgress = JSON.parse(localStorage.getItem(`reviewProgress_${currentUserUID}`)) || {};
+             const totalReviewWords = reviewWords.length;
+
+             if (totalReviewWords > 0) {
+                 let completedCount = 0;
+                 reviewWords.forEach(word => {
+                     if (reviewProgress[word.id] === true) { // Check if marked as completed
+                         completedCount++;
+                     }
+                 });
+
+                 const percentage = Math.round((completedCount / totalReviewWords) * 100);
+                 reviewProgressBar.style.width = `${percentage}%`;
+                 reviewProgressBar.textContent = `${percentage}%`;
+                 reviewProgressContainer.style.display = 'block'; // Show the progress bar
+
+                 // Update motivational message based on completion
+                 displayMotivationalMessage(completedCount, totalReviewWords);
+
+             } else {
+                 reviewProgressContainer.style.display = 'none'; // Hide if no review words
+                 displayMotivationalMessage(0, 0); // Show default/no words message
+             }
+         }
+
+/*// --- عرض رسالة تحفيزية ---
+         function displayMotivationalMessage(completed = -1, total = -1) {
+              const messages = [
+                  "استمر في العمل الرائع! الانتظام هو مفتاح النجاح.",
+                  "كل كلمة تتعلمها تقربك خطوة نحو الطلاقة!",
+                  "تحدى نفسك اليوم، واشكر نفسك غدًا.",
+                  "التعلم رحلة، استمتع بالعملية!",
+                  "خطوات صغيرة كل يوم تؤدي إلى نتائج كبيرة.",
+                  "ثق بنفسك، أنت قادر على ذلك!",
+                  "لا تخف من ارتكاب الأخطاء - فهي جزء من التعلم."
+              ];
+
+             let message = "";
+
+             if (total > 0) {
+                  if (completed === total) {
+                       message = "🎉 ممتاز! لقد أكملت جميع مراجعاتك لهذا اليوم! حان الوقت لتعلم كلمات جديدة أو الاسترخاء!";
+                  } else if (completed > 0) {
+                       const randomIndex = Math.floor(Math.random() * messages.length);
+                       message = `أنت تقوم بعمل رائع! تم إنجاز ${completed} من ${total} مراجعة. ${messages[randomIndex]}`;
+
+                  } else {
+                       // المستخدم لم يبدأ المراجعات بعد
+                       const randomIndex = Math.floor(Math.random() * messages.length);
+                       message = `هل أنت مستعد لمراجعة ${total} كلمة لهذا اليوم؟ ${messages[randomIndex]}`;
+                  }
+              } else if (total === 0 && wordCountElement.textContent !== '0' && wordCountElement.textContent !== 'Error') {
+                  // لم يتم تحديد أي كلمات للمراجعة (ربما أقل من 10 كلمات إجمالاً؟)
+                  message = "ليس لديك أي كلمات مجدولة للمراجعة اليوم. أضف المزيد من الكلمات أو تدرب في الألعاب!";
+             } else if (wordCountElement.textContent === '0') {
+                  message = "مرحباً بك! ابدأ بإضافة بعض الكلمات باستخدام صفحة 'إضافة كلمة'.";
+              } else {
+                  // حالة افتراضية أو حالة خطأ
+                  const randomIndex = Math.floor(Math.random() * messages.length);
+                  message = messages[randomIndex];
+              }
+
+
+             if (message) {
+                 motivationalMessageText.textContent = message;
+                 motivationalArea.style.display = 'block';
+             } else {
+                 motivationalArea.style.display = 'none';
+             }
+         }*/
+        // --- Display Motivational Message ---
+        function displayMotivationalMessage(completed = -1, total = -1) {
+             const messages = [
+                 "Keep up the great work! Consistency is key.",
+                 "Every word you learn brings you closer to fluency!",
+                 "Challenge yourself today, thank yourself tomorrow.",
+                 "Learning is a journey, enjoy the process!",
+                 "Small steps every day lead to big results.",
+                 "Believe in yourself, you've got this!",
+                 "Don't be afraid to make mistakes – they are part of learning."
+             ];
+
+            let message = "";
+
+            if (total > 0) {
+                 if (completed === total) {
+                      message = "🎉 Fantastic! You've completed all your reviews for today! Time to learn new words or relax!";
+                 } else if (completed > 0) {
+                      const randomIndex = Math.floor(Math.random() * messages.length);
+                      message = `You're doing great! ${completed} out of ${total} reviews done. ${messages[randomIndex]}`;
+                      
+                 } else {
+                      // User hasn't started reviews yet
+                      const randomIndex = Math.floor(Math.random() * messages.length);
+                      message = `Ready to tackle your ${total} review words for today? ${messages[randomIndex]}`;
+                 }
+             } else if (total === 0 && wordCountElement.textContent !== '0' && wordCountElement.textContent !== 'Error') {
+                 // No words selected for review (maybe less than 10 words total?)
+                 message = "You don't have any words scheduled for review today. Add more words or practice in the games!";
+            } else if (wordCountElement.textContent === '0') {
+                 message = "Welcome! Start by adding some words using the 'Add word' page.";
+             } else {
+                 // Default or error state
+                 const randomIndex = Math.floor(Math.random() * messages.length);
+                 message = messages[randomIndex];
+             }
+
+
+            if (message) {
+                motivationalMessageText.textContent = message;
+                motivationalArea.style.display = 'block';
+            } else {
+                motivationalArea.style.display = 'none';
+            }
+        }
+
+        // --- Logout Functionality ---
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default link behavior
+            signOut(auth)
+                .then(() => {
+                    // Clear user-specific localStorage on logout
+                    localStorage.removeItem(`reviewWords_${currentUserUID}`);
+                    localStorage.removeItem(`reviewDate_${currentUserUID}`);
+                    localStorage.removeItem(`reviewProgress_${currentUserUID}`);
+                    // Optional: Clear general items if needed, but be careful not to affect other users if the app is multi-user on one browser
+                    // localStorage.removeItem('loggedIn'); // If you use this
+                    console.log('User signed out successfully');
+                    window.location.href = 'index.html'; // Redirect to login/home page
+                })
+                .catch((error) => {
+                    console.error('Logout error:', error);
+                    // Inform user about the error?
+                    alert('Logout failed. Please try again.');
+                });
+        });
+
+    </script>
+
+</body>
+</html>

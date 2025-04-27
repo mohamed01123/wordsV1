@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review | English Mastery</title>
+    <link rel="stylesheet" href="css/style.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- أنماط أساسية (نفس أنماط dashboard) --- */
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        .main-header { background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; position: relative; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .logo { color: #333; font-size: 2rem; font-weight: 700; text-decoration: none; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .nav-links li { margin: 0 1rem; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 600; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #007bff; }
+        .footer { background-color: #333; color: white; text-align: center; padding: 1rem 0; width: 100%; margin-top: auto; }
+        .footer p { margin: 0; }
+
+        /* --- أنماط قسم المراجعة --- */
+         .review-section {
+             flex-grow: 1;
+             padding: 2rem 0;
+             display: flex;
+             justify-content: center;
+             align-items: center; /* توسيط عمودي */
+         }
+        .review-container {
+            max-width: 600px;
+            width: 90%; /* استخدام نسبة مئوية */
+            margin: 20px auto;
+            padding: 30px; /* زيادة الحشو */
+            background-color: #fff;
+            border-radius: 12px; /* زيادة دائرية الزوايا */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .review-container h2 {
+             font-size: 2rem;
+             color: #007bff;
+             margin-bottom: 1.5rem;
+        }
+         .word-item {
+             margin-bottom: 25px;
+             padding-bottom: 20px;
+             border-bottom: 1px solid #eee; /* خط فاصل خفيف */
+         }
+         .word-item:last-child {
+             border-bottom: none; /* إزالة الخط للآخر عنصر */
+             margin-bottom: 0;
+         }
+         .word {
+            font-size: 2rem; /* تكبير خط الكلمة */
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px; /* زيادة المسافة السفلية */
+            display: block; /* جعلها تحتل سطراً كاملاً */
+         }
+        input[type="text"] {
+            padding: 12px 15px;
+            border: 1px solid #ccc; /* تغيير لون الحدود */
+            border-radius: 6px;
+            width: 80%;
+            max-width: 350px; /* زيادة العرض الأقصى قليلاً */
+            font-size: 1.1rem; /* تكبير الخط قليلاً */
+            margin-bottom: 1rem; /* إضافة هامش سفلي */
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        input[type="text"]:focus {
+             border-color: #007bff;
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .button-container {
+            margin-top: 1.5rem; /* زيادة الهامش العلوي */
+            display: flex;
+            justify-content: center; /* توسيط الأزرار */
+            gap: 1rem; /* زيادة المسافة بين الأزرار */
+        }
+        button.btn-primary, button#check-answers {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 25px; /* زيادة الحشو */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1rem; /* تكبير الخط */
+            transition: background-color 0.3s ease;
+        }
+         button.btn-primary:hover, button#check-answers:hover {
+            background-color: #0056b3;
+        }
+         .correct {
+            color: #28a745; /* أخضر */
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .incorrect {
+            color: #dc3545; /* أحمر */
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 30px; /* حجز مساحة للرسالة */
+        }
+        .feedback-span {
+            display: block; /* جعلها تظهر تحت الحقل */
+            margin-top: 5px;
+            font-size: 0.9rem;
+            min-height: 1.2em; /* حجز مساحة صغيرة */
+        }
+         .loading-message {
+             font-size: 1.2rem;
+             color: #555;
+         }
+
+         /* --- Progress Bar Styles (نفس المستخدمة في dashboard) --- */
+         .progress-container {
+             width: 90%;
+             max-width: 500px;
+             background-color: #e0e0e0;
+             border-radius: 10px;
+             margin: 2rem auto 1rem auto; /* هامش علوي وسفلي */
+             overflow: hidden;
+             box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+         }
+         .progress-bar {
+             width: 0%;
+             height: 25px;
+             background-color: #4caf50;
+             text-align: center;
+             line-height: 25px;
+             color: white;
+             font-weight: bold;
+             border-radius: 10px 0 0 10px;
+             transition: width 0.5s ease-in-out;
+         }
+         /* --- End Progress Bar Styles --- */
+
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+             <a href="dashboard.html" class="logo">English Mastery</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" id="logoutLink">Logout</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li><a href="games.html">Games</a></li>
+                    <li><a href="review.html">Review</a></li>
+                    <li><a href="wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="review-section">
+        <div class="review-container">
+             <h2>Today's Word Review</h2>
+
+             <div class="progress-container" id="reviewProgressContainer" style="display: none;">
+                  <div class="progress-bar" id="reviewProgressBar">0%</div>
+             </div>
+
+             <div id="words-to-review">
+                 <p class="loading-message">Loading today's review words...</p>
+             </div>
+             <div class="button-container">
+                 <button id="check-answers" class="btn-primary" style="display: none;">Check Answers</button>
+                  </div>
+             <div id="review-feedback" class="feedback"></div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc, doc, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js"; // Added writeBatch
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.firebasestorage.app",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const wordsToReviewDiv = document.getElementById('words-to-review');
+        const checkAnswersButton = document.getElementById('check-answers');
+        const reviewFeedbackDiv = document.getElementById('review-feedback');
+        const logoutLink = document.getElementById('logoutLink');
+        const reviewProgressContainer = document.getElementById('reviewProgressContainer');
+        const reviewProgressBar = document.getElementById('reviewProgressBar');
+
+        // --- Global Variables ---
+        let currentUserUID = null;
+        let currentReviewWords = []; // سيحتوي على الكلمات من localStorage
+        let answerInputs = []; // لتخزين حقول الإدخال
+        let answerFeedbacks = []; // لتخزين عناصر عرض التغذية الراجعة
+        let reviewProgress = {}; // لتتبع التقدم
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserUID = user.uid;
+                loadReviewSession();
+            } else {
+                // Redirect to login if not authenticated
+                window.location.href = 'index.html';
+            }
+        });
+
+        // --- Load Review Session ---
+        function loadReviewSession() {
+            if (!currentUserUID) return;
+
+            console.log("Loading review session for user:", currentUserUID);
+
+             // Load review words and progress from localStorage
+            const storedWords = localStorage.getItem(`reviewWords_${currentUserUID}`);
+            const storedProgress = localStorage.getItem(`reviewProgress_${currentUserUID}`);
+            const reviewDate = localStorage.getItem(`reviewDate_${currentUserUID}`);
+            const today = new Date().toISOString().split('T')[0];
+
+            if (storedWords && reviewDate === today) {
+                 currentReviewWords = JSON.parse(storedWords);
+                 reviewProgress = storedProgress ? JSON.parse(storedProgress) : {};
+                 console.log("Loaded review words from localStorage:", currentReviewWords);
+                 console.log("Loaded review progress from localStorage:", reviewProgress);
+
+
+                 if (currentReviewWords.length > 0) {
+                    // Filter out words already marked as completed today
+                    const wordsForThisSession = currentReviewWords.filter(word => !reviewProgress[word.id]);
+
+                    if (wordsForThisSession.length > 0) {
+                        displayReviewWords(wordsForThisSession); // Display only remaining words
+                        updateReviewProgressBar(); // Update progress bar initially
+                    } else {
+                        // All words for today are already reviewed
+                         wordsToReviewDiv.innerHTML = '<p class="correct loading-message">🎉 You have completed all your reviews for today!</p>';
+                         checkAnswersButton.style.display = 'none';
+                         updateReviewProgressBar(); // Show 100% progress
+                    }
+                } else {
+                    wordsToReviewDiv.innerHTML = '<p class="loading-message">No words scheduled for review today. Go to the Dashboard to check.</p>';
+                    checkAnswersButton.style.display = 'none';
+                     reviewProgressContainer.style.display = 'none'; // Hide progress bar
+                }
+            } else {
+                // Words are outdated or not found
+                wordsToReviewDiv.innerHTML = '<p class="loading-message">Could not load review words. Please visit the Dashboard first to generate today\'s list.</p>';
+                checkAnswersButton.style.display = 'none';
+                reviewProgressContainer.style.display = 'none';
+                console.warn("Review words not found in localStorage or date mismatch.");
+            }
+        }
+
+        // --- Display Words for Review ---
+        function displayReviewWords(wordsToDisplay) {
+            wordsToReviewDiv.innerHTML = ''; // Clear previous content
+            answerInputs = [];
+            answerFeedbacks = [];
+
+             // Shuffle the words for variety in each session display
+             wordsToDisplay.sort(() => 0.5 - Math.random());
+
+            wordsToDisplay.forEach((wordObj, index) => {
+                // Ensure wordObj and wordObj.word are defined
+                 if (!wordObj || typeof wordObj.word === 'undefined') {
+                     console.error('Invalid word object encountered:', wordObj);
+                     return; // Skip this invalid entry
+                 }
+
+                const wordItem = document.createElement('div');
+                wordItem.classList.add('word-item');
+                // Use a unique ID for input and feedback based on word ID
+                const uniqueId = `word-${wordObj.id}`;
+                wordItem.innerHTML = `
+                    <label for="${uniqueId}-input" class="word">${wordObj.word}</label>
+                    <input type="text" id="${uniqueId}-input" data-word-id="${wordObj.id}" placeholder="Enter translation...">
+                    <span id="${uniqueId}-feedback" class="feedback-span"></span>
+                `;
+                wordsToReviewDiv.appendChild(wordItem);
+                answerInputs.push(document.getElementById(`${uniqueId}-input`));
+                answerFeedbacks.push(document.getElementById(`${uniqueId}-feedback`));
+            });
+
+            reviewFeedbackDiv.textContent = ''; // Clear overall feedback
+            if (wordsToDisplay.length > 0) {
+                 checkAnswersButton.style.display = 'block'; // Show check button only if there are words
+            } else {
+                 checkAnswersButton.style.display = 'none';
+            }
+        }
+
+        // --- Check User Answers ---
+        async function checkAnswers() {
+            if (!currentUserUID || answerInputs.length === 0) return;
+
+            console.log("Checking answers...");
+            let allCorrectInBatch = true;
+            let correctAnswersCount = 0;
+            const batch = writeBatch(db); // Initialize Firestore batch
+            let updatesMade = false; // Track if any updates are added to the batch
+
+            answerInputs.forEach((inputElement, index) => {
+                 const wordId = inputElement.dataset.wordId;
+                 const feedbackSpan = answerFeedbacks[index]; // Corresponding feedback span
+                 const userAnswer = inputElement.value.trim().toLowerCase();
+
+                 // Find the corresponding word object from the original list
+                 const wordObj = currentReviewWords.find(w => w.id === wordId);
+
+                if (!wordObj) {
+                    console.error(`Word object not found for ID: ${wordId}`);
+                    feedbackSpan.textContent = '(Error finding word)';
+                    feedbackSpan.className = 'feedback-span incorrect';
+                    allCorrectInBatch = false;
+                    return; // Skip this input
+                }
+
+                 const correctAnswer = (wordObj.translation || '').trim().toLowerCase();
+
+                 if (userAnswer === correctAnswer) {
+                     feedbackSpan.textContent = `✅ Correct!`;
+                     feedbackSpan.className = 'feedback-span correct';
+                     // Update score and difficulty in the word object
+                     wordObj.score = (wordObj.score || 0) + 1;
+                      if (!reviewProgress[wordId]) { // Mark as completed only if not already marked
+                           reviewProgress[wordId] = true;
+                           correctAnswersCount++;
+                      }
+                 } else {
+                     feedbackSpan.textContent = `❌ Incorrect. Correct: ${wordObj.translation}`;
+                     feedbackSpan.className = 'feedback-span incorrect';
+                     wordObj.score = (wordObj.score || 0) - 1;
+                     allCorrectInBatch = false;
+                 }
+
+                 // Determine new difficulty based on score
+                 if (wordObj.score >= 2) wordObj.difficulty = "easy";
+                 else if (wordObj.score <= -2) wordObj.difficulty = "hard";
+                 else wordObj.difficulty = "medium";
+
+                 // Add update to Firestore batch
+                 const wordRef = doc(db, "users", currentUserUID, "words", wordObj.id);
+                 batch.update(wordRef, {
+                     score: wordObj.score,
+                     difficulty: wordObj.difficulty
+                 });
+                 updatesMade = true;
+            });
+
+             // Commit the batch update to Firestore
+             if (updatesMade) {
+                 try {
+                     await batch.commit();
+                     console.log("Batch update successful for word scores/difficulties.");
+                 } catch (error) {
+                     console.error("Error committing batch update:", error);
+                     reviewFeedbackDiv.textContent = 'Error updating word data. Please try again.';
+                     reviewFeedbackDiv.className = 'feedback incorrect';
+                     return; // Stop further processing on error
+                 }
+             }
+
+
+             // Update progress in localStorage
+             localStorage.setItem(`reviewProgress_${currentUserUID}`, JSON.stringify(reviewProgress));
+             updateReviewProgressBar(); // Update the progress bar display
+
+             // Provide overall feedback and handle next steps
+             if (allCorrectInBatch) {
+                 reviewFeedbackDiv.textContent = 'Excellent! All answers in this set are correct.';
+                 reviewFeedbackDiv.className = 'feedback correct';
+                 // Automatically load the next batch or show completion message
+                 setTimeout(loadReviewSession, 1500); // Reload to show next set or completion
+             } else {
+                 reviewFeedbackDiv.textContent = 'Some answers were incorrect. Review the feedback above.';
+                 reviewFeedbackDiv.className = 'feedback incorrect';
+                 // Optionally, keep the current words displayed for review, or reload
+                 // setTimeout(loadReviewSession, 3000); // Reload after a longer delay if needed
+                 checkAnswersButton.textContent = "Check Again"; // Or "Next Set" maybe?
+             }
+             // Disable button temporarily to prevent double clicks
+             checkAnswersButton.disabled = true;
+             setTimeout(() => { checkAnswersButton.disabled = false; }, 1000);
+
+        }
+
+
+         // --- Update Review Progress Bar ---
+         function updateReviewProgressBar() {
+             const totalReviewWords = currentReviewWords.length;
+
+             if (totalReviewWords > 0) {
+                 let completedCount = 0;
+                 // Count completed words based on the 'reviewProgress' object
+                  Object.values(reviewProgress).forEach(isCompleted => {
+                      if (isCompleted === true) {
+                          completedCount++;
+                      }
+                  });
+                 // Alternative: Count based on the full list and progress map
+                 // currentReviewWords.forEach(word => {
+                 //     if (reviewProgress[word.id] === true) {
+                 //         completedCount++;
+                 //     }
+                 // });
+
+
+                 const percentage = Math.round((completedCount / totalReviewWords) * 100);
+                 reviewProgressBar.style.width = `${percentage}%`;
+                 reviewProgressBar.textContent = `${percentage}%`;
+                 reviewProgressContainer.style.display = 'block'; // Show the progress bar
+             } else {
+                 reviewProgressContainer.style.display = 'none'; // Hide if no review words
+             }
+         }
+
+        // --- Event Listeners ---
+        checkAnswersButton.addEventListener('click', checkAnswers);
+
+        // Add Enter key listener to the inputs container for convenience
+         wordsToReviewDiv.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && event.target.tagName === 'INPUT') {
+                checkAnswers(); // Trigger check when Enter is pressed in any input
+            }
+        });
+
+
+        // --- Logout Functionality ---
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            signOut(auth).then(() => {
+                console.log('User signed out.');
+                // No need to clear localStorage here as it's user-specific and
+                // will be handled by the login/auth state change logic.
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Error signing out:', error);
+                alert('Logout failed. Please try again.');
+            });
+        });
+
+    </script>
+
+</body>
+</html>

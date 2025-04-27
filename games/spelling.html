@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Game | English Mastery</title>
+    <link rel="stylesheet" href="../css/style.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Basic Styles (Keep similar to other pages) --- */
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333; display: flex; flex-direction: column; min-height: 100vh; align-items: center;}
+        .main-header { width: 100%; background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; position: relative; margin-bottom: 1rem;}
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .logo { color: #333; font-size: 2rem; font-weight: 700; text-decoration: none; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .nav-links li { margin: 0 1rem; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 600; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #007bff; }
+        .footer { background-color: #333; color: white; text-align: center; padding: 1rem 0; width: 100%; margin-top: auto; }
+        .footer p { margin: 0; }
+
+        /* --- Game Specific Styles --- */
+         .game-content {
+             flex-grow: 1;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             width: 100%;
+             padding: 20px;
+             box-sizing: border-box;
+         }
+        .spelling-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        .spelling-container h2 {
+            color: #28a745;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        .prompt-text {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .word-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        input[type="text"] {
+            direction: ltr;
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 400px;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+         input[type="text"]:focus {
+             border-color: #28a745;
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+        }
+        .button-container {
+             margin-top: 1.5rem;
+             display: flex;
+             justify-content: center;
+             gap: 1rem;
+         }
+        button#check-spelling, button#next-word {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+        }
+        button#check-spelling:hover:not(:disabled), button#next-word:hover:not(:disabled) {
+            background-color: #218838;
+        }
+         button:disabled {
+             background-color: #cccccc;
+             cursor: not-allowed;
+             opacity: 0.7;
+         }
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 1.5em;
+             font-size: 1.1rem;
+        }
+        .feedback.correct { color: #28a745; }
+        .feedback.incorrect { color: #dc3545; }
+
+        /* --- Game Progress Bar Styles --- */
+         .game-progress-container {
+             width: 90%;
+             max-width: 500px;
+             background-color: #e0e0e0;
+             border-radius: 10px;
+             margin: 1rem auto 1.5rem auto;
+             overflow: hidden;
+             box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+         }
+         .game-progress-bar {
+             width: 0%;
+             height: 20px;
+             /* Using a different color for game progress */
+             background-color: #17a2b8; /* Teal/Info color */
+             text-align: center;
+             line-height: 20px;
+             color: white;
+             font-weight: bold;
+             font-size: 0.9rem;
+             border-radius: 10px 0 0 10px;
+             transition: width 0.5s ease-in-out;
+         }
+         /* --- End Game Progress Bar Styles --- */
+         .loading-message {
+             font-size: 1.2rem;
+             color: #555;
+             margin: 20px;
+         }
+          .completion-message {
+             margin-top: 10px;
+             font-size: 1rem;
+             color: #17a2b8; /* Teal */
+             font-weight: bold;
+         }
+
+    </style>
+
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <a href="../dashboard.html" class="logo">English Mastery</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" id="logoutLink">Logout</a></li>
+                    <li><a href="../dashboard.html">Dashboard</a></li>
+                    <li><a href="../games.html">Games</a></li>
+                    <li><a href="../review.html">Review</a></li>
+                    <li><a href="../wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+     <div class="game-content">
+        <div class="spelling-container">
+            <h2>Spelling Challenge</h2>
+             <p class="prompt-text">Write the correct English spelling for the following Arabic word:</p>
+
+              <div class="game-progress-container" id="gameProgressContainer" style="display: none;">
+                  <div class="game-progress-bar" id="gameProgressBar">0/10 Words</div>
+             </div>
+             <div class="completion-message" id="gameCompletionMessage" style="display: none;">
+                 🎉 Game goal achieved for today! (10% added to daily progress)
+             </div>
+
+
+            <div class="word-display" id="word-to-spell">(Loading...)</div>
+            <input type="text" id="user-spelling" placeholder="Enter English spelling..." autocomplete="off">
+             <div class="button-container">
+                <button id="check-spelling">Check</button>
+                <button id="next-word" style="display: none;">Next Word</button>
+             </div>
+            <div id="spelling-feedback" class="feedback"></div>
+        </div>
+    </div>
+
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        // --- Firebase Imports ---
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc, query } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.firebasestorage.app",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const wordToSpellElement = document.getElementById('word-to-spell');
+        const userSpellingInput = document.getElementById('user-spelling');
+        const checkSpellingButton = document.getElementById('check-spelling');
+        const spellingFeedbackDiv = document.getElementById('spelling-feedback');
+        const nextWordButton = document.getElementById('next-word');
+        const logoutLink = document.getElementById('logoutLink');
+        const gameProgressContainer = document.getElementById('gameProgressContainer');
+        const gameProgressBar = document.getElementById('gameProgressBar');
+        const gameCompletionMessage = document.getElementById('gameCompletionMessage');
+
+
+        // --- Game State Variables ---
+        let currentUserUID = null;
+        let allUserWords = []; // All words from Firestore
+        let dailyReviewWords = []; // IDs only, from localStorage
+        let dailyReviewProgress = {}; // { wordId: boolean } from localStorage
+        let sessionErrors = []; // List of word IDs answered incorrectly in this session
+        let sessionCorrectUniqueWords = new Set(); // Track unique correct word IDs in this session
+        let currentWord = null; // The word object currently displayed
+        let isChecking = false; // Prevent double checks
+        let gameCompletedToday = false; // Track if this game's goal is met for the day
+        const GAME_COMPLETION_TARGET = 10; // Target number of unique correct words
+        const GAME_NAME = 'spelling'; // Unique name for this game in localStorage
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserUID = user.uid;
+                loadGameData();
+            } else {
+                window.location.href = '../index.html'; // Redirect if not logged in
+            }
+        });
+
+        // --- Load All Necessary Data ---
+        async function loadGameData() {
+             if (!currentUserUID) return;
+             console.log("Loading game data...");
+             wordToSpellElement.textContent = '(Loading...)';
+             disableButtons(true);
+
+             try {
+                 // 1. Load all words from Firestore
+                 const wordsRef = collection(db, "users", currentUserUID, "words");
+                 const q = query(wordsRef);
+                 const querySnapshot = await getDocs(q);
+                  allUserWords = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                  allUserWords = allUserWords.filter(word => word && word.word && word.translation); // Ensure needed fields exist
+                 console.log(`Loaded ${allUserWords.length} valid words from Firestore.`);
+
+                 // 2. Load daily review data from localStorage
+                 const storedReviewWords = localStorage.getItem(`reviewWords_${currentUserUID}`);
+                 const storedProgress = localStorage.getItem(`reviewProgress_${currentUserUID}`);
+                 const reviewDate = localStorage.getItem(`reviewDate_${currentUserUID}`);
+                 const today = new Date().toISOString().split('T')[0];
+
+                 if (storedReviewWords && reviewDate === today) {
+                     // Store only IDs for daily words, progress map is separate
+                     dailyReviewWords = JSON.parse(storedReviewWords).map(word => word.id);
+                     dailyReviewProgress = storedProgress ? JSON.parse(storedProgress) : {};
+                     console.log(`Loaded ${dailyReviewWords.length} daily review word IDs.`);
+                 } else {
+                     console.log("No valid daily review words found for today.");
+                     dailyReviewWords = [];
+                     dailyReviewProgress = {};
+                 }
+
+                 // 3. Check if game was already completed today
+                 const completionKey = `gameCompletion_${currentUserUID}_${GAME_NAME}_${today}`;
+                 gameCompletedToday = localStorage.getItem(completionKey) === 'true';
+                 console.log(`Game completed today (${GAME_NAME}): ${gameCompletedToday}`);
+
+
+                 // 4. Start the game
+                 sessionErrors = []; // Reset session errors
+                 sessionCorrectUniqueWords = new Set(); // Reset session correct words
+                 updateGameProgressIndicator(); // Show initial game progress (0/10)
+                 selectAndDisplayNextWord(); // Load the first word
+
+             } catch (error) {
+                 console.error("Error loading game data:", error);
+                 wordToSpellElement.textContent = '(Error)';
+                 spellingFeedbackDiv.textContent = 'Error loading words. Please try again later.';
+                 spellingFeedbackDiv.className = 'feedback incorrect';
+             }
+        }
+
+        // --- Select and Display the Next Word ---
+        function selectAndDisplayNextWord() {
+            console.log("Trying to select next word...");
+            currentWord = selectNextWordLogic(); // Get the next word based on priority
+
+            if (!currentWord) {
+                console.log("No more suitable words found.");
+                wordToSpellElement.textContent = '(No words left)';
+                 userSpellingInput.value = '';
+                 userSpellingInput.disabled = true;
+                 spellingFeedbackDiv.textContent = 'Game finished or no words available. Add more words!';
+                 spellingFeedbackDiv.className = 'feedback';
+                 disableButtons(true);
+                return;
+            }
+
+            console.log("Selected word (for spelling):", currentWord.word, "(ID:", currentWord.id, ")");
+             wordToSpellElement.textContent = currentWord.translation; // Show Arabic translation
+             userSpellingInput.value = '';
+             userSpellingInput.disabled = false;
+             spellingFeedbackDiv.textContent = ''; // Clear feedback
+             checkSpellingButton.style.display = 'inline-block';
+             nextWordButton.style.display = 'none';
+             disableButtons(false);
+             isChecking = false;
+             userSpellingInput.focus();
+        }
+
+        // --- Word Selection Logic ---
+        function selectNextWordLogic() {
+            // Priority 1: Session Errors
+             if (sessionErrors.length > 0) {
+                 const errorWordId = sessionErrors[0];
+                 const errorWord = allUserWords.find(w => w.id === errorWordId);
+                 if (errorWord) { console.log("Prioritizing error word:", errorWord.translation); return errorWord; }
+                 else { sessionErrors.shift(); return selectNextWordLogic(); }
+             }
+
+             // Priority 2: Incomplete Daily Review Words
+             const incompleteDailyWordIds = dailyReviewWords
+                 .filter(id => dailyReviewProgress[id] === false);
+
+             if (incompleteDailyWordIds.length > 0) {
+                 // Find corresponding word objects that are valid for the game
+                  const potentialDailyWords = incompleteDailyWordIds
+                       .map(id => allUserWords.find(w => w.id === id))
+                       .filter(word => word); // Ensure word exists
+
+                  if(potentialDailyWords.length > 0){
+                       const word = potentialDailyWords[Math.floor(Math.random() * potentialDailyWords.length)];
+                       console.log("Selecting incomplete daily word:", word.translation);
+                       return word;
+                  }
+             }
+
+
+             // Priority 3: Any other word not yet answered correctly this session (if target not met)
+             if (!gameCompletedToday || sessionCorrectUniqueWords.size < GAME_COMPLETION_TARGET) {
+                 const availableWords = allUserWords.filter(word => !sessionCorrectUniqueWords.has(word.id));
+                 if (availableWords.length > 0) {
+                     const word = availableWords[Math.floor(Math.random() * availableWords.length)];
+                     console.log("Selecting random word:", word.translation);
+                     return word;
+                 }
+             }
+             // If game goal is met, maybe prioritize harder words or just any word?
+             // For now, just pick any available if priorities are exhausted
+             if (allUserWords.length > 0) {
+                   const word = allUserWords[Math.floor(Math.random() * allUserWords.length)];
+                   console.log("Selecting random word (fallback):", word.translation);
+                   return word;
+             }
+
+
+             return null; // No words available
+         }
+
+
+        // --- Check User's Spelling ---
+        async function checkAnswer() {
+            if (!currentWord || isChecking) return;
+            isChecking = true;
+            disableButtons(true);
+
+            const userGuess = userSpellingInput.value.trim().toLowerCase();
+            const correctSpelling = currentWord.word.trim().toLowerCase();
+            const isUserCorrect = (userGuess === correctSpelling);
+
+            if (isUserCorrect) {
+                spellingFeedbackDiv.textContent = '✅ Excellent! Correct spelling.';
+                spellingFeedbackDiv.className = 'feedback correct';
+                sessionCorrectUniqueWords.add(currentWord.id); // Add to session unique correct words
+                updateGameProgressIndicator(); // Update game progress bar
+
+                // Remove from session errors if it was there
+                 const errorIndex = sessionErrors.indexOf(currentWord.id);
+                 if (errorIndex > -1) {
+                     sessionErrors.splice(errorIndex, 1);
+                     console.log("Removed from session errors:", currentWord.word);
+                 }
+            } else {
+                spellingFeedbackDiv.textContent = `❌ Incorrect. Correct: ${currentWord.word}`;
+                spellingFeedbackDiv.className = 'feedback incorrect';
+                // Add to session errors if not already there
+                if (!sessionErrors.includes(currentWord.id)) {
+                     sessionErrors.push(currentWord.id);
+                     console.log("Added to session errors:", currentWord.word);
+                }
+            }
+
+             // --- Update Firestore and LocalStorage ---
+             try {
+                 // 1. Update Score/Difficulty in Firestore
+                 const wordRef = doc(db, "users", currentUserUID, "words", currentWord.id);
+                 const scoreChange = isUserCorrect ? 1 : -1;
+                 currentWord.score = (currentWord.score || 0) + scoreChange;
+                 if (currentWord.score >= 2) currentWord.difficulty = "easy";
+                 else if (currentWord.score <= -2) currentWord.difficulty = "hard";
+                 else currentWord.difficulty = "medium";
+
+                 await updateDoc(wordRef, {
+                     score: currentWord.score,
+                     difficulty: currentWord.difficulty
+                 });
+                 console.log("Updated Firestore for word:", currentWord.word);
+
+                 // 2. Update Daily Review Progress if applicable and correct
+                 const isDailyWord = dailyReviewWords.includes(currentWord.id); // Check if ID is in the list
+                 if (isDailyWord && isUserCorrect && !dailyReviewProgress[currentWord.id]) {
+                     dailyReviewProgress[currentWord.id] = true;
+                     localStorage.setItem(`reviewProgress_${currentUserUID}`, JSON.stringify(dailyReviewProgress));
+                     console.log("Updated daily review progress for word:", currentWord.word);
+                     // Note: Overall daily progress is calculated on the dashboard
+                 }
+
+                 // 3. Check and Set Game Completion Status for the Day
+                  if (!gameCompletedToday && sessionCorrectUniqueWords.size >= GAME_COMPLETION_TARGET) {
+                       gameCompletedToday = true;
+                       const today = new Date().toISOString().split('T')[0];
+                       const completionKey = `gameCompletion_${currentUserUID}_${GAME_NAME}_${today}`;
+                       localStorage.setItem(completionKey, 'true');
+                       console.log(`Game goal achieved for ${GAME_NAME} today!`);
+                       gameCompletionMessage.style.display = 'block'; // Show completion message
+                       // We might want to update the overall progress on the dashboard immediately
+                       // This requires a more complex state management or triggering mechanism
+                       // For now, dashboard will pick it up on next load.
+                  }
+
+            } catch(error) {
+                 console.error("Error updating word data:", error);
+                 spellingFeedbackDiv.textContent += " (Error saving data)";
+                 spellingFeedbackDiv.className = 'feedback incorrect';
+            }
+
+             // --- UI Update for Next Step ---
+             userSpellingInput.disabled = true;
+             checkSpellingButton.style.display = 'none';
+             nextWordButton.style.display = 'inline-block';
+             nextWordButton.disabled = false;
+             nextWordButton.focus();
+        }
+
+        // --- Update Game Progress Bar (Specific to this game's goal) ---
+        function updateGameProgressIndicator() {
+             const currentCount = sessionCorrectUniqueWords.size;
+             const target = GAME_COMPLETION_TARGET;
+             const percentage = Math.min(100, Math.round((currentCount / target) * 100)); // Cap at 100%
+
+             gameProgressBar.style.width = `${percentage}%`;
+             gameProgressBar.textContent = `${currentCount}/${target} Correct Unique`;
+             gameProgressContainer.style.display = 'block';
+
+             // Show/Hide completion message based on status *loaded at start*
+             gameCompletionMessage.style.display = gameCompletedToday ? 'block' : 'none';
+         }
+
+
+         // --- Helper to Enable/Disable Buttons ---
+         function disableButtons(disabled) {
+             checkSpellingButton.disabled = disabled;
+             nextWordButton.disabled = disabled; // Disable next initially too
+             userSpellingInput.disabled = disabled;
+         }
+
+
+        // --- Event Listeners ---
+        checkSpellingButton.addEventListener('click', checkAnswer);
+        nextWordButton.addEventListener('click', selectAndDisplayNextWord);
+
+        userSpellingInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (checkSpellingButton.style.display !== 'none' && !checkSpellingButton.disabled) { // Enter on Check
+                    checkAnswer();
+                } else if (nextWordButton.style.display !== 'none' && !nextWordButton.disabled) { // Enter on Next
+                    selectAndDisplayNextWord();
+                }
+            }
+        });
+
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            signOut(auth).then(() => {
+                console.log('User signed out.');
+                window.location.href = '../index.html';
+            }).catch((error) => {
+                console.error('Error signing out:', error);
+                alert('Logout failed. Please try again.');
+            });
+        });
+
+    </script>
+</body>
+</html>

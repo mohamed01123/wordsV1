@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards Game | English Mastery</title>
+    <link rel="stylesheet" href="../css/style.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Basic Styles (Keep similar to other pages) --- */
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333; display: flex; flex-direction: column; min-height: 100vh; align-items: center;}
+        .main-header { width: 100%; background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; position: relative; margin-bottom: 1rem;}
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .logo { color: #333; font-size: 2rem; font-weight: 700; text-decoration: none; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .nav-links li { margin: 0 1rem; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 600; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #007bff; }
+        .footer { background-color: #333; color: white; text-align: center; padding: 1rem 0; width: 100%; margin-top: auto; }
+        .footer p { margin: 0; }
+
+        /* --- Game Specific Styles --- */
+         .game-content {
+             flex-grow: 1;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center; /* Center content vertically */
+             width: 100%;
+             padding: 20px;
+             box-sizing: border-box;
+         }
+        .game-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px; /* Adjust width if needed */
+            width: 90%;
+        }
+         .game-container h1 {
+             color: #00796B; /* Teal color from original */
+             margin-bottom: 1.5rem;
+         }
+        .card {
+            width: 80%;
+            max-width: 350px; /* Max width for the card */
+            height: 220px; /* Increased height */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem; /* Larger font */
+            background: linear-gradient(135deg, #80deea, #26c6da); /* Original gradient */
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto; /* Center card */
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            padding: 15px; /* Add padding */
+             word-wrap: break-word; /* Prevent long words from overflowing */
+             line-height: 1.4;
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+        }
+        .buttons {
+            display: flex;
+            gap: 15px; /* Increased gap */
+            justify-content: center; /* Center buttons */
+            margin-top: 1.5rem;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: 600;
+        }
+         button:hover:not(:disabled) {
+             transform: translateY(-2px);
+         }
+         button:active:not(:disabled) {
+             transform: translateY(0);
+         }
+        button:disabled {
+             cursor: not-allowed;
+             opacity: 0.7;
+        }
+        .correct { background-color: #4CAF50; color: white; }
+        .correct:hover:not(:disabled) { background-color: #45a049; }
+        .wrong { background-color: #F44336; color: white; }
+        .wrong:hover:not(:disabled) { background-color: #e53935; }
+        .speker { background-color: #2196F3; color: white; }
+        .speker:hover:not(:disabled) { background-color: #1976D2; }
+
+         /* --- Progress Bar Styles --- */
+          .progress-container {
+             width: 90%;
+             max-width: 400px;
+             background-color: #e0e0e0;
+             border-radius: 10px;
+             margin: 1rem auto 1.5rem auto; /* Adjust margins */
+             overflow: hidden;
+             box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+         }
+         .progress-bar {
+             width: 0%;
+             height: 20px; /* Slightly smaller height */
+             background-color: #ffc107; /* Yellow for game progress */
+             text-align: center;
+             line-height: 20px;
+             color: #333; /* Darker text for yellow */
+             font-weight: bold;
+             font-size: 0.9rem;
+             border-radius: 10px 0 0 10px;
+             transition: width 0.5s ease-in-out;
+         }
+         /* --- End Progress Bar Styles --- */
+          .loading-message {
+             font-size: 1.2rem;
+             color: #555;
+             margin: 20px;
+         }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <a href="../dashboard.html" class="logo">English Mastery</a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" id="logoutLink">Logout</a></li>
+                    <li><a href="../dashboard.html">Dashboard</a></li>
+                    <li><a href="../games.html">Games</a></li>
+                    <li><a href="../review.html">Review</a></li>
+                    <li><a href="../wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+     <div class="game-content">
+        <div class="game-container">
+            <h1>Flashcards</h1>
+
+             <div class="progress-container" id="dailyProgressContainer" style="display: none;">
+                  <div class="progress-bar" id="dailyProgressBar">0%</div>
+             </div>
+
+            <div class="card" id="flashcard">Loading...</div>
+            <div class="buttons">
+                <button class="correct" id="correctButton" disabled>I got it right</button>
+                <button class="wrong" id="wrongButton" disabled>I got it wrong</button>
+                <button class="speker" id="readCardButton" disabled>🔊</button>
+            </div>
+         </div>
+    </div>
+
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        // --- Firebase Imports ---
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc, query } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.firebasestorage.app",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const flashcardDiv = document.getElementById("flashcard");
+        const correctButton = document.getElementById("correctButton");
+        const wrongButton = document.getElementById("wrongButton");
+        const readCardButton = document.getElementById("readCardButton");
+        const logoutLink = document.getElementById('logoutLink');
+        const dailyProgressContainer = document.getElementById('dailyProgressContainer');
+        const dailyProgressBar = document.getElementById('dailyProgressBar');
+
+        // --- Game State Variables ---
+        let currentUserUID = null;
+        let allUserWords = []; // All words from Firestore
+        let dailyReviewWords = []; // IDs of daily review words from localStorage
+        let dailyReviewProgress = {}; // { wordId: boolean } from localStorage
+        let sessionErrors = []; // List of word IDs marked wrong in this session
+        let currentWord = null; // The word object currently displayed
+        let showingTranslation = false; // Track if translation is shown
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserUID = user.uid;
+                loadGameData();
+            } else {
+                window.location.href = '../index.html'; // Redirect if not logged in
+            }
+        });
+
+        // --- Load All Necessary Data ---
+        async function loadGameData() {
+            if (!currentUserUID) return;
+            console.log("Loading game data...");
+            flashcardDiv.innerHTML = '<p class="loading-message">Loading words...</p>';
+             disableButtons(true); // Disable buttons while loading
+
+            try {
+                // 1. Load all words from Firestore
+                const wordsRef = collection(db, "users", currentUserUID, "words");
+                const q = query(wordsRef);
+                const querySnapshot = await getDocs(q);
+                 allUserWords = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                 console.log(`Loaded ${allUserWords.length} words from Firestore.`);
+
+                // 2. Load daily review data from localStorage
+                const storedReviewWords = localStorage.getItem(`reviewWords_${currentUserUID}`);
+                const storedProgress = localStorage.getItem(`reviewProgress_${currentUserUID}`);
+                const reviewDate = localStorage.getItem(`reviewDate_${currentUserUID}`);
+                const today = new Date().toISOString().split('T')[0];
+
+                if (storedReviewWords && reviewDate === today) {
+                    dailyReviewWords = JSON.parse(storedReviewWords);
+                    dailyReviewProgress = storedProgress ? JSON.parse(storedProgress) : {};
+                    console.log(`Loaded ${dailyReviewWords.length} daily review words.`);
+                    updateDailyProgressIndicator(); // Update progress bar
+                } else {
+                    console.log("No valid daily review words found for today.");
+                    dailyReviewWords = [];
+                    dailyReviewProgress = {};
+                     dailyProgressContainer.style.display = 'none'; // Hide progress bar
+                }
+
+                // 3. Start the game
+                sessionErrors = []; // Reset session errors
+                loadNextCard();
+            } catch (error) {
+                console.error("Error loading game data:", error);
+                flashcardDiv.innerHTML = '<p class="feedback incorrect">Error loading words. Please try again later.</p>';
+            } finally {
+                 disableButtons(false); // Re-enable buttons after loading (if words found)
+            }
+        }
+
+        // --- Select and Load the Next Card ---
+        function loadNextCard() {
+            console.log("Trying to load next card...");
+             showingTranslation = false; // Reset to show word first
+             currentWord = selectNextWord(); // Get the next word based on priority
+
+            if (!currentWord) {
+                console.log("No more suitable words found.");
+                flashcardDiv.innerHTML = '<p class="loading-message">No more words available. Add more words!</p>';
+                flashcardDiv.style.cursor = 'default'; // Remove pointer cursor
+                disableButtons(true);
+                return;
+            }
+
+            console.log("Selected word:", currentWord.word, "(ID:", currentWord.id, ")");
+             flashcardDiv.innerText = currentWord.word;
+             flashcardDiv.style.cursor = 'pointer'; // Ensure pointer cursor
+             disableButtons(false); // Ensure buttons are enabled
+        }
+
+        // --- Word Selection Logic with Priority ---
+         function selectNextWord() {
+             // Priority 1: Words marked wrong in this session
+             if (sessionErrors.length > 0) {
+                 const errorWordId = sessionErrors[0]; // Take the first error word
+                 const errorWord = allUserWords.find(w => w.id === errorWordId);
+                 if (errorWord) {
+                     console.log("Prioritizing error word:", errorWord.word);
+                     return errorWord;
+                 } else {
+                      sessionErrors.shift(); // Word might have been deleted
+                      return selectNextWord(); // Try again
+                 }
+             }
+
+             // Priority 2: Incomplete Daily Review Words
+             const incompleteDailyWords = dailyReviewWords
+                 .filter(dailyWord => dailyReviewProgress[dailyWord.id] === false)
+                 .map(dailyWord => allUserWords.find(w => w.id === dailyWord.id))
+                 .filter(word => word); // Ensure the word exists in allUserWords
+
+             if (incompleteDailyWords.length > 0) {
+                 const randomIndex = Math.floor(Math.random() * incompleteDailyWords.length);
+                 const dailyWordToReview = incompleteDailyWords[randomIndex];
+                 console.log("Selecting incomplete daily word:", dailyWordToReview.word);
+                 return dailyWordToReview;
+             }
+
+             // Priority 3: Any other word from the full list (can add filters later)
+             const availableWords = allUserWords.filter(w => w); // Basic filter to ensure word object exists
+
+             if (availableWords.length > 0) {
+                  // Simple random selection for now
+                 const randomIndex = Math.floor(Math.random() * availableWords.length);
+                 const randomWord = availableWords[randomIndex];
+                 console.log("Selecting random word:", randomWord.word);
+                 return randomWord;
+             }
+
+             return null; // No suitable word found
+         }
+
+
+        // --- Flip Card ---
+        function flipCard() {
+            if (!currentWord) return;
+            if (showingTranslation) {
+                flashcardDiv.innerText = currentWord.word;
+            } else {
+                flashcardDiv.innerText = currentWord.translation || "(No translation)";
+            }
+            showingTranslation = !showingTranslation;
+        }
+
+        // --- Mark Answer (Correct/Wrong Buttons) ---
+        async function markAnswer(gotItRight) {
+            if (!currentWord) return;
+
+            disableButtons(true); // Disable buttons during processing
+
+            const scoreChange = gotItRight ? 1 : -1;
+
+            // --- Handle Session Errors ---
+             const errorIndex = sessionErrors.indexOf(currentWord.id);
+             if (gotItRight && errorIndex > -1) {
+                 // User got it right after getting it wrong in this session
+                 sessionErrors.splice(errorIndex, 1); // Remove from errors
+                 console.log("Removed from session errors:", currentWord.word);
+             } else if (!gotItRight && errorIndex === -1) {
+                 // User got it wrong for the first time this session
+                 sessionErrors.push(currentWord.id); // Add to errors
+                 console.log("Added to session errors:", currentWord.word);
+             }
+
+
+            // --- Update Firestore and LocalStorage ---
+             try {
+                 // 1. Update Score/Difficulty in Firestore
+                 const wordRef = doc(db, "users", currentUserUID, "words", currentWord.id);
+                 currentWord.score = (currentWord.score || 0) + scoreChange;
+                 // Determine new difficulty
+                 if (currentWord.score >= 2) currentWord.difficulty = "easy";
+                 else if (currentWord.score <= -2) currentWord.difficulty = "hard";
+                 else currentWord.difficulty = "medium";
+
+                 await updateDoc(wordRef, {
+                     score: currentWord.score,
+                     difficulty: currentWord.difficulty
+                 });
+                 console.log("Updated Firestore for word:", currentWord.word);
+
+                 // 2. Update Daily Progress if applicable and correct
+                 const isDailyWord = dailyReviewWords.some(dw => dw.id === currentWord.id);
+                 if (isDailyWord && gotItRight && !dailyReviewProgress[currentWord.id]) {
+                     dailyReviewProgress[currentWord.id] = true;
+                     localStorage.setItem(`reviewProgress_${currentUserUID}`, JSON.stringify(dailyReviewProgress));
+                     console.log("Updated daily progress for word:", currentWord.word);
+                     updateDailyProgressIndicator(); // Update UI
+                 }
+
+                 // 3. Load next card after a short delay
+                 setTimeout(loadNextCard, 300); // Load next card quickly
+
+             } catch(error) {
+                 console.error("Error updating word data:", error);
+                 flashcardDiv.innerText = "Error saving progress."; // Show error on card
+                 disableButtons(false); // Re-enable buttons on error
+             }
+
+        }
+
+         // --- Update Daily Progress Bar ---
+         function updateDailyProgressIndicator() {
+            const totalDaily = dailyReviewWords.length;
+            if (totalDaily > 0) {
+                let completedCount = 0;
+                dailyReviewWords.forEach(word => {
+                    if (dailyReviewProgress[word.id] === true) {
+                        completedCount++;
+                    }
+                });
+                const percentage = Math.round((completedCount / totalDaily) * 100);
+                dailyProgressBar.style.width = `${percentage}%`;
+                dailyProgressBar.textContent = `Daily Review: ${percentage}%`;
+                dailyProgressContainer.style.display = 'block';
+            } else {
+                dailyProgressContainer.style.display = 'none'; // Hide if no daily words
+            }
+        }
+
+
+        // --- Text-to-Speech ---
+        function speak(text, lang = 'en-US') {
+            if ('speechSynthesis' in window && text) {
+                speechSynthesis.cancel(); // Cancel any previous speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                speechSynthesis.speak(utterance);
+            } else {
+                 console.warn("Speech synthesis not supported or no text to speak.");
+            }
+        }
+
+         // --- Helper to Enable/Disable Buttons ---
+         function disableButtons(disabled) {
+             correctButton.disabled = disabled;
+             wrongButton.disabled = disabled;
+             readCardButton.disabled = disabled;
+         }
+
+
+        // --- Event Listeners ---
+        flashcardDiv.addEventListener("click", flipCard);
+        correctButton.addEventListener("click", () => markAnswer(true));
+        wrongButton.addEventListener("click", () => markAnswer(false));
+        readCardButton.addEventListener('click', () => {
+             // Speak the text currently shown on the card
+             const textToSpeak = flashcardDiv.innerText;
+             // Determine language based on whether translation is shown
+             const lang = showingTranslation ? 'ar' : 'en-US'; // Assuming Arabic translation
+             speak(textToSpeak, lang);
+        });
+
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            signOut(auth).then(() => {
+                console.log('User signed out.');
+                window.location.href = '../index.html';
+            }).catch((error) => {
+                console.error('Error signing out:', error);
+                alert('Logout failed. Please try again.');
+            });
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete the Sentence | English Mastery</title>
+    <link rel="stylesheet" href="../css/style.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Basic Styles (Keep similar to other pages) --- */
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f5f5f5; color: #333; display: flex; flex-direction: column; min-height: 100vh; align-items: center;}
+        .main-header { width: 100%; background-color: #fff; padding: 1rem 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; position: relative; margin-bottom: 1rem;}
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+        .logo { color: #333; font-size: 2rem; font-weight: 700; text-decoration: none; }
+        .nav-links { list-style: none; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .nav-links li { margin: 0 1rem; }
+        .nav-links a { text-decoration: none; color: #333; font-weight: 600; transition: color 0.3s ease; }
+        .nav-links a:hover { color: #007bff; }
+        .footer { background-color: #333; color: white; text-align: center; padding: 1rem 0; width: 100%; margin-top: auto; }
+        .footer p { margin: 0; }
+
+        /* --- Game Specific Styles --- */
+         .game-content {
+             flex-grow: 1;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center; /* Center content vertically */
+             width: 100%;
+             padding: 20px;
+             box-sizing: border-box;
+         }
+        .game-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 700px; /* Limit width */
+            width: 90%;
+        }
+         .game-container h1 {
+             color: #0277bd;
+             margin-bottom: 1.5rem;
+         }
+        .sentence-container {
+             margin-bottom: 1.5rem;
+        }
+        .sentence {
+            font-size: 1.8rem; /* Slightly larger */
+            margin-bottom: 10px;
+            color: #333;
+            line-height: 1.6; /* Improve readability */
+        }
+        .example-translation {
+            font-size: 1rem;
+            color: #666; /* Darker grey */
+            margin-top: 5px;
+            font-style: italic;
+        }
+        input[type="text"] {
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            width: 80%;
+            max-width: 400px;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+         input[type="text"]:focus {
+             border-color: #007bff;
+             outline: none;
+             box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center; /* Center buttons */
+            margin-top: 1.5rem;
+        }
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            background: linear-gradient(to right, #039be5, #0288d1);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover:not(:disabled) { /* Add :not(:disabled) */
+            background: linear-gradient(to right, #4fc3f7, #29b6f6);
+        }
+        button:disabled { /* Style for disabled button */
+             background: #cccccc;
+             cursor: not-allowed;
+        }
+        .speker {
+            background: linear-gradient(to right, #43a047, #388e3c); /* Green */
+        }
+        .speker:hover:not(:disabled) {
+            background: linear-gradient(to right, #66bb6a, #4caf50);
+        }
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            min-height: 1.5em; /* Reserve space */
+             font-size: 1.1rem;
+        }
+         .feedback.correct { color: #28a745; }
+         .feedback.incorrect { color: #dc3545; }
+
+        /* --- Progress Bar Styles --- */
+         .progress-container {
+             width: 90%;
+             max-width: 500px;
+             background-color: #e0e0e0;
+             border-radius: 10px;
+             margin: 1rem auto 1.5rem auto; /* Adjust margins */
+             overflow: hidden;
+             box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+         }
+         .progress-bar {
+             width: 0%;
+             height: 20px; /* Slightly smaller height */
+             background-color: #ffc107; /* Yellow for game progress */
+             text-align: center;
+             line-height: 20px;
+             color: #333; /* Darker text for yellow */
+             font-weight: bold;
+             font-size: 0.9rem;
+             border-radius: 10px 0 0 10px;
+             transition: width 0.5s ease-in-out;
+         }
+         /* --- End Progress Bar Styles --- */
+          .loading-message {
+             font-size: 1.2rem;
+             color: #555;
+         }
+
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <a href="../dashboard.html" class="logo">English Mastery</a> <nav>
+                <ul class="nav-links">
+                    <li><a href="#" id="logoutLink">Logout</a></li>
+                    <li><a href="../dashboard.html">Dashboard</a></li>
+                    <li><a href="../games.html">Games</a></li>
+                    <li><a href="../review.html">Review</a></li>
+                    <li><a href="../wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="game-content">
+        <div class="game-container">
+            <h1>Complete the Sentence</h1>
+
+             <div class="progress-container" id="dailyProgressContainer" style="display: none;">
+                  <div class="progress-bar" id="dailyProgressBar">0%</div>
+             </div>
+
+            <div class="sentence-container">
+                <div class="sentence" id="sentence">Loading...</div>
+                <div class="example-translation" id="sentence-translation"></div>
+            </div>
+            <input type="text" id="userInput" placeholder="Type the missing word(s)..." autocomplete="off">
+            <div class="button-container">
+                <button id="checkButton">Check</button>
+                <button class="speker" id="readSentenceButton">🔊</button>
+            </div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>Designed and developed by Zouka &copy; 2025.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        // --- Firebase Imports ---
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc, query, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.firebasestorage.app",
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM Elements ---
+        const sentenceElement = document.getElementById("sentence");
+        const translationElement = document.getElementById("sentence-translation");
+        const userInput = document.getElementById("userInput");
+        const checkButton = document.getElementById("checkButton");
+        const feedbackElement = document.getElementById("feedback");
+        const readSentenceButton = document.getElementById("readSentenceButton");
+        const logoutLink = document.getElementById('logoutLink');
+        const dailyProgressContainer = document.getElementById('dailyProgressContainer');
+        const dailyProgressBar = document.getElementById('dailyProgressBar');
+
+        // --- Game State Variables ---
+        let currentUserUID = null;
+        let allUserWords = []; // All words from Firestore
+        let dailyReviewWords = []; // IDs of daily review words
+        let dailyReviewProgress = {}; // { wordId: boolean }
+        let sessionErrors = []; // List of word IDs answered incorrectly in this session
+        let currentWord = null; // The word object currently displayed
+        let isChecking = false; // Prevent double checks
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserUID = user.uid;
+                loadGameData();
+            } else {
+                window.location.href = '../index.html'; // Redirect if not logged in
+            }
+        });
+
+        // --- Load All Necessary Data ---
+        async function loadGameData() {
+             if (!currentUserUID) return;
+             console.log("Loading game data...");
+             sentenceElement.innerHTML = '<p class="loading-message">Loading words...</p>';
+             translationElement.textContent = '';
+             checkButton.disabled = true; // Disable button while loading
+
+             try {
+                 // 1. Load all words from Firestore
+                 const wordsRef = collection(db, "users", currentUserUID, "words");
+                 const q = query(wordsRef);
+                 const querySnapshot = await getDocs(q);
+                 allUserWords = querySnapshot.docs
+                     .map(doc => ({ id: doc.id, ...doc.data() }))
+                     .filter(word => word.example && word.example.includes(word.word)); // Filter for words with valid examples initially
+
+                 console.log(`Loaded ${allUserWords.length} words with examples from Firestore.`);
+
+                 // 2. Load daily review data from localStorage
+                 const storedReviewWords = localStorage.getItem(`reviewWords_${currentUserUID}`);
+                 const storedProgress = localStorage.getItem(`reviewProgress_${currentUserUID}`);
+                 const reviewDate = localStorage.getItem(`reviewDate_${currentUserUID}`);
+                 const today = new Date().toISOString().split('T')[0];
+
+                 if (storedReviewWords && reviewDate === today) {
+                     dailyReviewWords = JSON.parse(storedReviewWords);
+                     dailyReviewProgress = storedProgress ? JSON.parse(storedProgress) : {};
+                     console.log(`Loaded ${dailyReviewWords.length} daily review words.`);
+                     updateDailyProgressIndicator(); // Update progress bar
+                 } else {
+                     console.log("No valid daily review words found for today.");
+                     dailyReviewWords = [];
+                     dailyReviewProgress = {};
+                      dailyProgressContainer.style.display = 'none'; // Hide progress bar if no daily words
+                 }
+
+                 // 3. Start the game
+                 sessionErrors = []; // Reset session errors
+                 loadNextSentence();
+             } catch (error) {
+                 console.error("Error loading game data:", error);
+                 sentenceElement.innerHTML = '<p class="feedback incorrect">Error loading words. Please try again later.</p>';
+             } finally {
+                 checkButton.disabled = false; // Re-enable button
+             }
+        }
+
+        // --- Select and Load the Next Sentence ---
+        function loadNextSentence() {
+            console.log("Trying to load next sentence...");
+            feedbackElement.textContent = ""; // Clear feedback
+            userInput.value = ""; // Clear input
+            userInput.disabled = false;
+            checkButton.disabled = false;
+            checkButton.textContent = "Check";
+            isChecking = false;
+
+             currentWord = selectNextWord(); // Get the next word based on priority
+
+             if (!currentWord) {
+                console.log("No more suitable words found.");
+                sentenceElement.innerHTML = '<p class="loading-message">No more sentences available right now. Add more words with examples!</p>';
+                translationElement.textContent = "";
+                checkButton.disabled = true; // Disable check button if no word
+                readSentenceButton.disabled = true;
+                return;
+            }
+
+            console.log("Selected word:", currentWord.word, "(ID:", currentWord.id, ")");
+
+             // --- Prepare sentence with blanks ---
+             // This part might need refinement for multi-word blanks or more complex scenarios
+             // For now, it replaces the first occurrence of the word (case-insensitive)
+             const regex = new RegExp(`\\b${currentWord.word}\\b`, 'i'); // Match whole word, case-insensitive
+             if (!currentWord.example || !regex.test(currentWord.example)) {
+                 console.warn(`Word "${currentWord.word}" not found in its example: "${currentWord.example}". Skipping.`);
+                 // Attempt to load another sentence immediately if the example is invalid
+                  loadNextSentence();
+                 return;
+             }
+
+             const sentenceWithBlanks = currentWord.example.replace(regex, "______");
+
+             sentenceElement.textContent = sentenceWithBlanks;
+             translationElement.textContent = currentWord.exampleTranslation || ""; // Show example translation if available
+             readSentenceButton.dataset.originalSentence = currentWord.example; // Store for speech
+             readSentenceButton.disabled = false;
+             userInput.focus();
+        }
+
+
+        // --- Word Selection Logic with Priority ---
+         function selectNextWord() {
+             // Priority 1: Words answered incorrectly in this session
+             if (sessionErrors.length > 0) {
+                 const errorWordId = sessionErrors[0]; // Take the first error word
+                 const errorWord = allUserWords.find(w => w.id === errorWordId);
+                 if (errorWord) {
+                     console.log("Prioritizing error word:", errorWord.word);
+                     return errorWord;
+                 } else {
+                      // Word might have been deleted, remove from errors
+                      sessionErrors.shift();
+                      return selectNextWord(); // Recursively try again
+                 }
+             }
+
+             // Priority 2: Incomplete Daily Review Words
+             const incompleteDailyWords = dailyReviewWords
+                 .filter(dailyWord => dailyReviewProgress[dailyWord.id] === false) // Find those not completed
+                 .map(dailyWord => allUserWords.find(w => w.id === dailyWord.id)) // Get full word object
+                 .filter(word => word && word.example && word.example.includes(word.word)); // Ensure it has a valid example
+
+             if (incompleteDailyWords.length > 0) {
+                 const randomIndex = Math.floor(Math.random() * incompleteDailyWords.length);
+                 const dailyWordToReview = incompleteDailyWords[randomIndex];
+                 console.log("Selecting incomplete daily word:", dailyWordToReview.word);
+                 return dailyWordToReview;
+             }
+
+             // Priority 3: Any other word from the full list
+             const availableWords = allUserWords.filter(word =>
+                 word.example && word.example.includes(word.word)
+                 // Optional: Add more filters, e.g., exclude 'easy' words or words already seen this session
+             );
+
+             if (availableWords.length > 0) {
+                 const randomIndex = Math.floor(Math.random() * availableWords.length);
+                 const randomWord = availableWords[randomIndex];
+                 console.log("Selecting random word:", randomWord.word);
+                 return randomWord;
+             }
+
+             return null; // No suitable word found
+         }
+
+
+        // --- Check User's Answer ---
+        async function checkSentence() {
+            if (!currentWord || isChecking) return; // Ensure a word is loaded and not already checking
+            isChecking = true; // Prevent double clicks
+            checkButton.disabled = true; // Disable button during check
+
+            const userAnswer = userInput.value.trim().toLowerCase();
+            // For simplicity, assume the blank always represents the main word itself.
+            // More complex logic would be needed if blanks represent different words.
+            const correctAnswer = currentWord.word.toLowerCase();
+            let isUserCorrect = (userAnswer === correctAnswer);
+
+             // --- Provide Feedback ---
+             if (isUserCorrect) {
+                feedbackElement.textContent = "✅ Correct!";
+                feedbackElement.className = 'feedback correct';
+                userInput.disabled = true; // Disable input after correct answer
+
+                // Remove from session errors if it was there
+                 const errorIndex = sessionErrors.indexOf(currentWord.id);
+                 if (errorIndex > -1) {
+                     sessionErrors.splice(errorIndex, 1);
+                     console.log("Removed word from session errors:", currentWord.word);
+                 }
+
+            } else {
+                feedbackElement.textContent = `❌ Incorrect. Correct: ${currentWord.word}`;
+                feedbackElement.className = 'feedback incorrect';
+
+                // Add to session errors if not already there
+                if (!sessionErrors.includes(currentWord.id)) {
+                     sessionErrors.push(currentWord.id);
+                     console.log("Added word to session errors:", currentWord.word);
+                }
+            }
+
+            // --- Update Firestore and LocalStorage ---
+            try {
+                 // 1. Update Score/Difficulty in Firestore
+                 const wordRef = doc(db, "users", currentUserUID, "words", currentWord.id);
+                 const scoreChange = isUserCorrect ? 1 : -1;
+                 currentWord.score = (currentWord.score || 0) + scoreChange;
+                 // Determine new difficulty
+                 if (currentWord.score >= 2) currentWord.difficulty = "easy";
+                 else if (currentWord.score <= -2) currentWord.difficulty = "hard";
+                 else currentWord.difficulty = "medium";
+
+                 await updateDoc(wordRef, {
+                     score: currentWord.score,
+                     difficulty: currentWord.difficulty
+                 });
+                 console.log("Updated Firestore for word:", currentWord.word);
+
+                 // 2. Update Daily Progress if applicable and correct
+                 const isDailyWord = dailyReviewWords.some(dw => dw.id === currentWord.id);
+                 if (isDailyWord && isUserCorrect && !dailyReviewProgress[currentWord.id]) {
+                     dailyReviewProgress[currentWord.id] = true;
+                     localStorage.setItem(`reviewProgress_${currentUserUID}`, JSON.stringify(dailyReviewProgress));
+                     console.log("Updated daily progress for word:", currentWord.word);
+                     updateDailyProgressIndicator(); // Update UI
+                 }
+
+            } catch(error) {
+                 console.error("Error updating word data:", error);
+                 feedbackElement.textContent += " (Error updating data)";
+                 feedbackElement.className = 'feedback incorrect';
+            }
+
+             // --- Load Next ---
+             checkButton.textContent = "Next";
+             checkButton.disabled = false; // Re-enable button as 'Next'
+             // Keep isChecking = true until user clicks 'Next' or presses Enter
+             // setTimeout(loadNextSentence, 1500); // Or load automatically after a delay
+
+        }
+
+        // --- Update Daily Progress Bar ---
+        function updateDailyProgressIndicator() {
+            const totalDaily = dailyReviewWords.length;
+            if (totalDaily > 0) {
+                let completedCount = 0;
+                dailyReviewWords.forEach(word => {
+                    if (dailyReviewProgress[word.id] === true) {
+                        completedCount++;
+                    }
+                });
+                const percentage = Math.round((completedCount / totalDaily) * 100);
+                dailyProgressBar.style.width = `${percentage}%`;
+                dailyProgressBar.textContent = `Daily Review: ${percentage}%`;
+                dailyProgressContainer.style.display = 'block';
+            } else {
+                dailyProgressContainer.style.display = 'none'; // Hide if no daily words
+            }
+        }
+
+
+        // --- Text-to-Speech ---
+        function speak(text, lang = 'en-US') {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel(); // Cancel any previous speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang;
+                 // Optional: Try to find a specific voice if needed
+                 // const voices = speechSynthesis.getVoices();
+                 // utterance.voice = voices.find(voice => voice.lang === lang);
+                speechSynthesis.speak(utterance);
+            } else {
+                 console.warn("Speech synthesis not supported in this browser.");
+            }
+        }
+
+        // --- Event Listeners ---
+        checkButton.addEventListener('click', () => {
+            if (checkButton.textContent === "Check") {
+                checkSentence();
+            } else {
+                 loadNextSentence(); // Treat as 'Next' button
+            }
+        });
+
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                if (!isChecking) { // If Enter is pressed before clicking 'Check'
+                     checkSentence();
+                 } else if (checkButton.textContent === "Next" && !checkButton.disabled) { // If Enter is pressed after checking (acting as 'Next')
+                    loadNextSentence();
+                 }
+            }
+        });
+
+        readSentenceButton.addEventListener('click', () => {
+            const sentenceToRead = readSentenceButton.dataset.originalSentence;
+            if (sentenceToRead) {
+                speak(sentenceToRead);
+            }
+        });
+
+        logoutLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            signOut(auth).then(() => {
+                console.log('User signed out.');
+                window.location.href = '../index.html';
+            }).catch((error) => {
+                console.error('Error signing out:', error);
+                alert('Logout failed. Please try again.');
+            });
+        });
+
+    </script>
+</body>
+</html>

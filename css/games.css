@@ -1,0 +1,128 @@
+/* تحسين تخطيط وتصميم العنوان لضمان تنظيمه وجاذبيته البصرية. اجعله متجاوبًا مع جميع أحجام الشاشات */
+header {
+    background-color: #333; /* لون خلفية مميز للعنوان */
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+    position: fixed; /* تثبيت العنوان في الأعلى */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* ضمان بقاء العنوان فوق العناصر الأخرى */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* ظل خفيف لتحسين التمييز */
+}
+
+header h1 {
+    margin: 0; /* إزالة الهوامش الافتراضية لعنوان الصفحة */
+}
+/* أنماط عامة للألعاب */
+.game-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 800px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* أنماط البطاقات التعليمية */
+.flashcard {
+    perspective: 1000px;
+    width: 300px;
+    height: 200px;
+    margin: 0 auto 20px;
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.flashcard-front {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+}
+
+.flashcard-back {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    transform: rotateY(180deg);
+}
+
+/* أنماط لعبة المطابقة */
+.matching-game {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 15px;
+}
+
+.word-column, .translation-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.word-item, .translation-item {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.word-item:hover, .translation-item:hover {
+    background-color: #f5f5f5;
+}
+
+/* أنماط نتائج الألعاب */
+.game-result {
+    text-align: center;
+    padding: 20px;
+}
+
+.game-result h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+.fill-game {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.fill-game input {
+    margin: 15px 0;
+    padding: 10px;
+    width: 80%;
+}
+
+.game-feedback {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+}

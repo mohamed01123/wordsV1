@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | English Mastery</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .container {
+            max-width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .error-message,
+        .success-message {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        .success-message {
+            color: green;
+        }
+
+        #register-section {
+            margin-top: 20px;
+            border-top: 1px solid #ccc;
+            padding-top: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h2>تسجيل الدخول</h2>
+        <form id="loginForm">
+            <input type="text" id="loginUsername" placeholder="اسم المستخدم (بدون @gmail.com)">
+            <input type="password" id="loginPassword" placeholder="كلمة المرور">
+            <button type="submit">تسجيل الدخول</button>
+            <p id="loginErrorMessage" class="error-message"></p>
+        </form>
+
+        <div id="register-section">
+            <h3>إنشاء حساب جديد</h3>
+            <form id="registerForm">
+                <input type="text" id="registerUsername" placeholder="اسم المستخدم الجديد (بدون @gmail.com)">
+                <input type="password" id="registerPassword" placeholder="كلمة المرور الجديدة">
+                <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة">
+                <button type="button" id="registerButton">إنشاء حساب</button>
+                <p id="registerErrorMessage" class="error-message"></p>
+                <p id="registerSuccessMessage" class="success-message" style="display: none;"></p>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        // تأكد من أن الروابط التالية صحيحة وتعمل
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        // تم استبدال القيم بقيم مشروعك الصحيحة
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+            authDomain: "tekam-3a3d9.firebaseapp.com",
+            projectId: "tekam-3a3d9",
+            storageBucket: "tekam-3a3d9.appspot.com", // <-- تأكد من صحة هذه القيمة من وحدة تحكم Firebase
+            messagingSenderId: "792257539056",
+            appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+            measurementId: "G-7QT7Z3RMC9"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app); // تأكد من تمكين Firestore في مشروعك إذا كنت ستستخدمه
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('loginForm');
+            const loginUsernameInput = document.getElementById('loginUsername');
+            const loginPasswordInput = document.getElementById('loginPassword');
+            const loginErrorMessageDiv = document.getElementById('loginErrorMessage');
+
+            const registerForm = document.getElementById('registerForm');
+            const registerUsernameInput = document.getElementById('registerUsername');
+            const registerPasswordInput = document.getElementById('registerPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const registerButton = document.getElementById('registerButton');
+            const registerErrorMessageDiv = document.getElementById('registerErrorMessage');
+            const registerSuccessMessageDiv = document.getElementById('registerSuccessMessage');
+
+            // معالجة تسجيل الدخول
+            loginForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                // يتم إضافة @gmail.com هنا، تأكد أن المستخدم يُدخل اسم المستخدم فقط
+                const email = loginUsernameInput.value.trim() + '@gmail.com';
+                const password = loginPasswordInput.value.trim();
+
+                signInWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        // Signed in
+                        const user = userCredential.user;
+                        // ...
+                        localStorage.setItem('loggedIn', 'true');
+                        // Redirect after successful login
+                        window.location.href = 'dashboard.html';
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        loginErrorMessageDiv.textContent = 'اسم المستخدم أو كلمة المرور غير صحيحة.';
+                        console.error("Login Error Code:", errorCode); // لعرض الخطأ في الـ Console
+                        console.error("Login Error Message:", errorMessage); // لعرض الخطأ في الـ Console
+                    });
+            });
+
+            // معالجة تسجيل مستخدم جديد
+            registerButton.addEventListener('click', function (event) {
+                const username = registerUsernameInput.value.trim();
+                // يتم إضافة @gmail.com هنا، تأكد أن المستخدم يُدخل اسم المستخدم فقط
+                const email = registerUsernameInput.value.trim() + '@gmail.com';
+                const password = registerPasswordInput.value.trim();
+                const confirmPassword = confirmPasswordInput.value.trim();
+
+                registerErrorMessageDiv.textContent = ''; // مسح رسالة الخطأ القديمة
+                registerSuccessMessageDiv.style.display = 'none'; // إخفاء رسالة النجاح القديمة
+
+
+                if (!username || !password || !confirmPassword) {
+                    registerErrorMessageDiv.textContent = 'يرجى ملء جميع الحقول.';
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    registerErrorMessageDiv.textContent = 'كلمة المرور وتأكيد كلمة المرور غير متطابقتين.';
+                    return;
+                }
+
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        // Signed up
+                        const user = userCredential.user;
+                        // حفظ اسم المستخدم في Firestore (اختياري، تأكد من تفعيل Firestore)
+                        const userRef = doc(db, 'users', user.uid);
+                        setDoc(userRef, {
+                            username: username,
+                            email: email // قد ترغب بحفظ الإيميل أيضاً
+                        })
+                            .then(() => {
+                                registerSuccessMessageDiv.textContent = 'تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول.';
+                                registerSuccessMessageDiv.style.display = 'block';
+                                registerForm.reset(); // مسح نموذج التسجيل
+                            })
+                            .catch((error) => {
+                                // حدث خطأ أثناء الحفظ في Firestore لكن تم إنشاء الحساب بنجاح
+                                console.error('Error adding document: ', error);
+                                registerErrorMessageDiv.textContent = 'تم إنشاء الحساب ولكن حدث خطأ في حفظ بيانات المستخدم.'; // رسالة خطأ بديلة
+                            });
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        // التعامل مع الأخطاء الشائعة
+                        if (errorCode === 'auth/email-already-in-use') {
+                            registerErrorMessageDiv.textContent = 'هذا البريد الإلكتروني مسجل بالفعل.';
+                        } else if (errorCode === 'auth/invalid-email') {
+                            registerErrorMessageDiv.textContent = 'صيغة البريد الإلكتروني غير صحيحة.';
+                        } else if (errorCode === 'auth/weak-password') {
+                            registerErrorMessageDiv.textContent = 'كلمة المرور ضعيفة جداً (يجب أن تكون 6 أحرف على الأقل).';
+                        } else {
+                            registerErrorMessageDiv.textContent = 'حدث خطأ أثناء إنشاء الحساب.';
+                        }
+                        console.error("Register Error Code:", errorCode); // لعرض الخطأ في الـ Console
+                        console.error("Register Error Message:", errorMessage); // لعرض الخطأ في الـ Console
+                    });
+
+            });
+        });
+    </script>
+
+</body>
+
+</html>

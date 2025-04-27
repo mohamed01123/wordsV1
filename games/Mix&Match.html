@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Matching Game</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to top right, #fce4ec, #f8bbd0);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            color: #ad1457;
+        }
+        .game-container {
+            display: flex;
+            gap: 40px; /* زيادة المسافة بين الصفين */
+            margin-top: 30px;
+            align-items: flex-start; /* محاذاة العناصر من الأعلى */
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            min-width: 120px;
+            text-align: center;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+        .card:hover {
+            background: #fce4ec;
+        }
+        .selected {
+            background: #fff9c4 !important;
+        }
+        .matched {
+            background-color: #c8e6c9 !important;
+            pointer-events: none;
+        }
+        .feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <h1 class="logo">English Mastery</h1>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="../dashboard.html">logout</a></li>
+                    <li><a href="../dashboard.html">Dashboard</a></li>
+                    <li><a href="../games.html">Games</a></li>
+                    <li><a href="../review.html">Review</a></li>
+                    <li><a href="../wordsmanger.html">Add word</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <h1>Match the Word with Its Translation</h1>
+    <div class="game-container">
+        <div class="column" id="arabic-translations"></div>
+        <div class="column" id="english-words"></div>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <script type="module">
+            import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+            import { getFirestore, collection, getDocs, updateDoc, doc, query } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyCsEtjzlSRu-sXsZryxP0Znl0xyf8AU8pQ",
+                authDomain: "tekam-3a3d9.firebaseapp.com",
+                projectId: "tekam-3a3d9",
+                storageBucket: "tekam-3a3d9.firebasestorage.app",
+                messagingSenderId: "792257539056",
+                appId: "1:792257539056:web:d3cf470b6145e78e3d0b35",
+                measurementId: "G-7QT7Z3RMC9"
+            };
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            let currentUserUID = null;
+
+            let words = []; // سيتم جلب الكلمات الخاصة بالمستخدم هنا
+            let chosenWords = [];
+            let englishCards = [];
+            let arabicCards = [];
+            let selectedCards = [];
+            let matchedPairs = {}; // { englishWord: arabicTranslation }
+
+             onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    window.location.href = '../login.html';
+                } else {
+                     currentUserUID = user.uid;
+                     loadGame();
+                }
+            });
+
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            async function loadGame() {
+                 if (!currentUserUID) {
+                    document.getElementById("feedback").innerText = "Please log in to play.";
+                    document.getElementById("english-words").innerHTML = "";
+                    document.getElementById("arabic-translations").innerHTML = "";
+                    return;
+                }
+                  const wordsRef = collection(db, "users", currentUserUID, "words");
+                  const q = query(wordsRef);
+                  const querySnapshot = await getDocs(q);
+                  words = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (words.length < 6) {
+                    document.getElementById("feedback").innerText = "Need at least 6 words to play.";
+                    document.getElementById("english-words").innerHTML = "";
+                    document.getElementById("arabic-translations").innerHTML = "";
+                    return;
+                }
+                const englishContainer = document.getElementById("english-words");
+                const arabicContainer = document.getElementById("arabic-translations");
+                const feedback = document.getElementById("feedback");
+                englishContainer.innerHTML = "";
+                arabicContainer.innerHTML = "";
+                feedback.innerText = "";
+                selectedCards = [];
+                matchedPairs = {};
+                chosenWords = shuffle([...words]).slice(0, 6); // Use a copy to avoid modifying original array
+                const shuffledTranslations = shuffle(chosenWords.map(w => w.translation));
+
+                chosenWords.forEach((wordObj, index) => {
+                    const engCard = document.createElement("div");
+                    engCard.classList.add("card");
+                    engCard.innerText = wordObj.word;
+                    engCard.dataset.word = wordObj.word;
+                    engCard.addEventListener("click",() => selectCard(engCard, "english"));
+                    englishContainer.appendChild(engCard);
+                    englishCards.push(engCard);
+
+                    const arCard = document.createElement("div");
+                    arCard.classList.add("card");
+                    arCard.innerText = shuffledTranslations[index];
+                    arCard.dataset.translation = shuffledTranslations[index];
+                    arCard.addEventListener("click",() => selectCard(arCard, "arabic"));
+                    arabicContainer.appendChild(arCard);
+                    arabicCards.push(arCard);
+                });
+            }
+
+            async function selectCard(card, type) {
+                if (card.classList.contains("matched") || card.classList.contains("selected")) return;
+
+                card.classList.add("selected");
+                selectedCards.push({ card, type });
+
+                if (selectedCards.length === 2) {
+                    const [card1, card2] = selectedCards;
+                    const word1 = card1.card.dataset.word;
+                    const trans1 = card1.card.dataset[card1.type === "english" ? "word" : "translation"];
+                    const word2 = card2.card.dataset.word;
+                    const trans2 = card2.card.dataset[card2.type === "english" ? "word" : "translation"];
+
+                    let isMatch = false;
+                    if (card1.type === "english" && card2.type === "arabic") {
+                        isMatch = chosenWords.find(w => w.word === word1 && w.translation === trans2);
+                    } else if (card1.type === "arabic" && card2.type === "english") {
+                        isMatch = chosenWords.find(w => w.word === trans2 && w.translation === trans1);
+                    }
+
+                    if (isMatch) {
+                        card1.card.classList.add("matched");
+                        card2.card.classList.add("matched");
+                        matchedPairs[word1 || trans2] = trans2 || word1;
+
+                         let matchedWordObj = words.find(w => w.word === word1 || w.word === trans2);
+                        if (matchedWordObj) {
+                            matchedWordObj.score = (matchedWordObj.score || 0) + 1;
+                             await updateDifficulty(matchedWordObj);
+                        }
+                    } else {
+                        setTimeout(() => {
+                            card1.card.classList.remove("selected");
+                            card2.card.classList.remove("selected");
+                        }, 700);
+
+                        let wrongWordObj1 = words.find(w => w.word === word1 || w.word === trans2);
+                        let wrongWordObj2 = words.find(w => w.word === word2 || w.word === trans1);
+                        if (wrongWordObj1) {
+                            wrongWordObj1.score = (wrongWordObj1.score || 0) - 0.5; // Penalize slightly
+                            await updateDifficulty(wrongWordObj1);
+                        }
+                        if (wrongWordObj2 && wrongWordObj1 !== wrongWordObj2) {
+                            wrongWordObj2.score = (wrongWordObj2.score || 0) - 0.5;
+                            await updateDifficulty(wrongWordObj2);
+                        }
+                    }
+                     selectedCards = [];
+
+                    if (Object.keys(matchedPairs).length === 6) {
+                        document.getElementById("feedback").innerText = "🎉 You matched all pairs! Loading new words...";
+                        setTimeout(loadGame, 1500); // تحميل مجموعة جديدة بعد 1.5 ثانية
+                    }
+                }
+            }
+
+           async function updateDifficulty(word) {
+                 if (word.score >= 2) word.difficulty = "easy";
+                else if (word.score <= -2) word.difficulty = "hard";
+                else word.difficulty = "medium";
+                try {
+                    const wordRef = doc(db, "users", currentUserUID, "words", word.id);
+                    await updateDoc(wordRef, {
+                        score: word.score,
+                        difficulty: word.difficulty
+                    });
+                } catch (error) {
+                    console.error("Error updating word score:", error);
+                }
+            }
+
+    logoutLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        signOut(auth)
+            .then(() => {
+                localStorage.removeItem('loggedIn');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            })
+            .catch((error) => {
+                console.error('Logout error', error);
+            });
+    });
+        </script>
+</body>
+</html>
